@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedir orçamento — Genova Forge</title>
+<meta name="description" content="Peça o orçamento do seu site, loja ou sistema à Genova Forge. A ficha vai direto pro nosso WhatsApp.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+  main { padding: 48px 0 80px; }
+  .grade { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: start; }
+  @media (max-width: 860px) { .grade { grid-template-columns: 1fr; } .lateral { order: -1; } }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 8px; }
+  .sub { color: var(--texto-suave); margin-bottom: 32px; }
+  .passo-titulo { font-size: 1.05rem; margin: 8px 0 14px; display: flex; align-items: center; gap: 10px; }
+  .passo-titulo span { width: 26px; height: 26px; border-radius: 50%; background: var(--gradiente); display: grid; place-items: center; font-size: .8rem; }
+  .opcoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-bottom: 24px; }
+  .op { position: relative; }
+  .op input { position: absolute; opacity: 0; pointer-events: none; }
+  .op span { display: block; padding: 12px 10px; border: 1px solid var(--borda); border-radius: 12px; font-size: .9rem; cursor: pointer; background: var(--card); text-align: center; height: 100%; }
+  .op small { display: block; color: var(--texto-suave); font-size: .75rem; margin-top: 2px; }
+  .op input:checked + span { border-color: var(--roxo-claro); background: rgba(124,58,237,.14); }
+  .op input:focus-visible + span { outline: 2px solid var(--roxo-claro); }
+  .pote { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .lateral h3 { font-size: 1.1rem; margin-bottom: 14px; }
+  .lateral ol { padding-left: 20px; color: var(--texto-suave); font-size: .93rem; }
+  .lateral li { margin-bottom: 10px; }
+  .lateral li strong { color: var(--texto); }
+  .sucesso { text-align: center; padding: 48px 24px; }
+  .sucesso .icone { width: 64px; height: 64px; border-radius: 50%; background: rgba(52,211,153,.15); color: var(--ok); display: grid; place-items: center; font-size: 2rem; margin: 0 auto 16px; }
+  .sucesso p { color: var(--texto-suave); max-width: 440px; margin: 8px auto 24px; }
+  .enviar { width: 100%; margin-top: 8px; padding: 15px; font-size: 1rem; }
+  .btn-whats { background: #25d366; color: #062b14; }
+  .letra-miuda { font-size: .8rem; color: var(--texto-suave); margin-top: 12px; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="container">
+    <a href="index.html"><img src="logo.png" alt="Genova Forge"></a>
+    <a href="contrato.html" class="voltar">Já é cliente? Área do cliente →</a>
+  </div>
+</header>
+
+<main class="container">
+  <div class="grade">
+    <section>
+      <h1>Peça seu orçamento</h1>
+      <p class="sub">Preencha a ficha e ela vai <strong>direto pro nosso WhatsApp</strong>. Sem compromisso e sem pagar nada agora.</p>
+
+      <div id="sucesso" class="card sucesso escondido" role="status" aria-live="polite">
+        <div class="icone">✓</div>
+        <h2>Ficha pronta!</h2>
+        <p>Abrimos o WhatsApp com a sua ficha preenchida. É só apertar <strong>enviar</strong> lá. Se não abriu, toque no botão:</p>
+        <a id="link-whats" class="btn btn-whats" href="#" target="_blank" rel="noopener">Enviar no WhatsApp</a>
+        <p style="margin-top:20px"><a href="index.html">Voltar ao site</a></p>
+      </div>
+
+      <form id="form" class="card" novalidate>
+        <div id="aviso" class="aviso erro escondido" role="alert"></div>
+
+        <h2 class="passo-titulo"><span>1</span> O que você precisa?</h2>
+        <div class="opcoes" id="tipos">
+          <label class="op"><input type="radio" name="tipoSite" value="INSTITUCIONAL" checked><span>Site da empresa</span></label>
+          <label class="op"><input type="radio" name="tipoSite" value="LOJA_VIRTUAL"><span>Loja virtual</span></label>
+          <label class="op"><input type="radio" name="tipoSite" value="CARDAPIO"><span>Cardápio / restaurante</span></label>
+          <label class="op"><input type="radio" name="tipoSite" value="PORTFOLIO"><span>Portfólio</span></label>
+          <label class="op"><input type="radio" name="tipoSite" value="LANDING_PAGE"><span>Landing page</span></label>
+          <label class="op"><input type="radio" name="tipoSite" value="SISTEMA"><span>Sistema / estoque</span></label>
+          <label class="op"><input type="radio" name="tipoSite" value="AUTOMACAO"><span>Automação</span></label>
+          <label class="op"><input type="radio" name="tipoSite" value="OUTRO"><span>Outro</span></label>
+        </div>
+
+        <div class="campo" data-campo="descricao">
+          <label for="descricao">Conta como você imagina *</label>
+          <textarea id="descricao" name="descricao" maxlength="3000" required placeholder="Ex: loja de roupas com uns 50 produtos, frete pelos Correios e pagamento no Pix e cartão. Quero cores parecidas com o meu Instagram."></textarea>
+          <div class="msg-erro"></div>
+        </div>
+        <div class="linha">
+          <div class="campo" data-campo="referencias">
+            <label for="referencias">Instagram ou site de referência</label>
+            <input id="referencias" name="referencias" maxlength="500" placeholder="@seunegocio">
+            <div class="msg-erro"></div>
+          </div>
+          <div class="campo" data-campo="prazo">
+            <label for="prazo">Pra quando precisa?</label>
+            <select id="prazo" name="prazo">
+              <option value="">Sem pressa</option>
+              <option>Até 15 dias</option><option>Até 30 dias</option><option>1 a 2 meses</option>
+            </select>
+          </div>
+        </div>
+
+        <h2 class="passo-titulo"><span>2</span> Plano de interesse</h2>
+        <div class="opcoes">
+          <label class="op"><input type="radio" name="planoInteresse" value="GENOVA_HOSPEDA" checked><span>Genova Hospeda<small>a gente hospeda e cuida</small></span></label>
+          <label class="op"><input type="radio" name="planoInteresse" value="INDEPENDENTE"><span>Independente<small>domínio e servidor seus</small></span></label>
+          <label class="op"><input type="radio" name="planoInteresse" value=""><span>Ainda não sei<small>me explica</small></span></label>
+        </div>
+
+        <h2 class="passo-titulo"><span>3</span> Seus dados</h2>
+        <div class="linha">
+          <div class="campo" data-campo="nome">
+            <label for="nome">Nome *</label>
+            <input id="nome" name="nome" autocomplete="name" maxlength="120" required>
+            <div class="msg-erro"></div>
+          </div>
+          <div class="campo" data-campo="telefone">
+            <label for="telefone">WhatsApp *</label>
+            <input id="telefone" name="telefone" type="tel" autocomplete="tel" inputmode="numeric" placeholder="(11) 90000-0000" maxlength="16" required>
+            <div class="msg-erro"></div>
+          </div>
+        </div>
+        <div class="linha">
+          <div class="campo" data-campo="empresa">
+            <label for="empresa">Empresa / marca</label>
+            <input id="empresa" name="empresa" autocomplete="organization" maxlength="120">
+            <div class="msg-erro"></div>
+          </div>
+          <div class="campo" data-campo="email">
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="160">
+            <div class="msg-erro"></div>
+          </div>
+        </div>
+
+        <div class="pote" aria-hidden="true"><label for="site">Não preencha</label><input id="site" name="site" tabindex="-1" autocomplete="off"></div>
+
+        <button type="submit" class="btn btn-principal enviar" id="enviar">Enviar ficha pelo WhatsApp</button>
+        <p class="letra-miuda">Seus dados são usados só pra montar o orçamento.</p>
+      </form>
+    </section>
+
+    <aside class="lateral card">
+      <h3>Como funciona</h3>
+      <ol>
+        <li><strong>Você envia a ficha</strong>: ela chega no nosso WhatsApp.</li>
+        <li><strong>A gente conversa</strong> e te manda o valor fechado.</li>
+        <li><strong>Você recebe um número de contrato</strong> (ex: GF-2026-0002).</li>
+        <li><strong>Na Área do cliente</strong>, digita o número + CPF, confere tudo e paga no <strong>Pix, boleto ou cartão</strong> (dá pra parcelar).</li>
+        <li><strong>Site no ar!</strong> E você tem 30 dias de suporte pra ajustes.</li>
+      </ol>
+    </aside>
+  </div>
+</main>
+
+<script src="config.js"></script>
+<script src="comum.js"></script>
+<script>
+(() => {
+  const form = document.getElementById('form');
+  const aviso = document.getElementById('aviso');
+  const botao = document.getElementById('enviar');
+  const plano = new URLSearchParams(location.search).get('plano');
+  if (plano) { const r = form.querySelector(`input[name=planoInteresse][value="${CSS.escape(plano)}"]`); if (r) r.checked = true; }
+  G.mascaraTel(document.getElementById('telefone'));
+  if (!window.GENOVA_WHATSAPP) botao.textContent = 'Enviar ficha';
+
+  const marcar = (campo, msg) => {
+    const c = form.querySelector(`[data-campo="${campo}"]`); if (!c) return;
+    c.classList.add('invalido'); c.querySelector('.msg-erro').textContent = msg;
+  };
+
+  function ficha(d) {
+    const tipo = form.querySelector('input[name=tipoSite]:checked').closest('label').innerText.trim();
+    const pl = form.querySelector('input[name=planoInteresse]:checked').closest('label').querySelector('span').childNodes[0].textContent.trim();
+    return [
+      '*Nova ficha de orçamento — Genova Forge*', '',
+      `*Nome:* ${d.nome}`,
+      d.empresa ? `*Empresa:* ${d.empresa}` : null,
+      `*WhatsApp:* ${d.telefone}`,
+      d.email ? `*E-mail:* ${d.email}` : null,
+      `*Tipo:* ${tipo}`,
+      `*Plano:* ${pl}`,
+      d.prazo ? `*Prazo:* ${d.prazo}` : null,
+      d.referencias ? `*Referência:* ${d.referencias}` : null,
+      '', '*O que precisa:*', d.descricao
+    ].filter(l => l !== null).join('\n');
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    aviso.classList.add('escondido');
+    form.querySelectorAll('.invalido').forEach(c => c.classList.remove('invalido'));
+    const d = Object.fromEntries(new FormData(form).entries());
+    let ok = true;
+    if (!d.nome.trim()) { marcar('nome', 'Informe seu nome'); ok = false; }
+    if (G.so(d.telefone).length < 10) { marcar('telefone', 'WhatsApp com DDD'); ok = false; }
+    if (d.email && !/^\S+@\S+\.\S+$/.test(d.email)) { marcar('email', 'E-mail inválido'); ok = false; }
+    if (!d.descricao.trim()) { marcar('descricao', 'Conta pra gente o que você precisa'); ok = false; }
+    if (!ok) { form.querySelector('.invalido input, .invalido textarea')?.focus(); return; }
+
+    botao.disabled = true; botao.textContent = 'Enviando...';
+    const link = G.linkWhats(ficha(d));
+    try {
+      await G.post('/api/pedidos', d); // registra no painel
+    } catch (err) {
+      if (err.campos) { Object.entries(err.campos).forEach(([k, v]) => marcar(k, v)); botao.disabled = false; botao.textContent = 'Tentar de novo'; return; }
+      // API fora do ar: segue pro WhatsApp mesmo assim, a ficha não se perde
+    }
+    document.getElementById('link-whats').href = link;
+    form.classList.add('escondido');
+    document.getElementById('sucesso').classList.remove('escondido');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.GENOVA_WHATSAPP) {
+      location.href = link; // abre o WhatsApp com a ficha pronta (no celular, abre o app)
+    } else {
+      document.querySelector('#sucesso h2').textContent = 'Ficha recebida!';
+      document.querySelector('#sucesso p').textContent = 'Já recebemos sua ficha e vamos te chamar no WhatsApp. Se quiser adiantar, fala com a gente no Instagram:';
+      document.getElementById('link-whats').textContent = 'Abrir Instagram';
+    }
+  });
+})();
+</script>
+</body>
+</html>

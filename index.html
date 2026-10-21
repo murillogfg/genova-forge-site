@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genova Forge — Sites e Sistemas sob Medida</title>
+<meta name="description" content="Genova Forge: criamos sites, lojas virtuais e sistemas sob medida. Planos com hospedagem, domínio e manutenção inclusos. São Paulo, SP.">
+<meta property="og:title" content="Genova Forge — Sites e Sistemas sob Medida">
+<meta property="og:description" content="A gente cria, hospeda e cuida do seu site. Planos com hospedagem inclusa ou site independente.">
+<meta property="og:url" content="https://genovaforge.com.br">
+<meta name="theme-color" content="#0b1437">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<meta property="og:image" content="https://genovaforge.com.br/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ====== CORES DA MARCA (edite aqui) ====== */
+  :root {
+    --roxo: #7c3aed;
+    --roxo-claro: #a78bfa;
+    --marinho: #0b1437;
+    --marinho-escuro: #070d24;
+    --royal: #1d6ff2;
+    --texto: #e8ebf7;
+    --texto-suave: #a3abc9;
+    --card: rgba(255,255,255,0.04);
+    --borda: rgba(255,255,255,0.09);
+    --gradiente: linear-gradient(135deg, var(--roxo), var(--royal));
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--marinho-escuro);
+    color: var(--texto);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, .logo-texto { font-family: 'Space Grotesk', sans-serif; line-height: 1.15; }
+  a { color: inherit; text-decoration: none; }
+  .container { width: min(1120px, 100% - 32px); margin-inline: auto; }
+  section { padding: 96px 0; }
+  .tag {
+    display: inline-block; font-size: .8rem; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--roxo-claro); margin-bottom: 12px;
+  }
+  .titulo-secao { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 16px; }
+  .sub-secao { color: var(--texto-suave); max-width: 560px; }
+
+  /* ====== BOTÕES ====== */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px;
+    border-radius: 12px; font-weight: 600; transition: transform .2s, box-shadow .2s, background .2s;
+  }
+  .btn-principal { background: var(--gradiente); color: #fff; box-shadow: 0 8px 30px rgba(124,58,237,.35); }
+  .btn-principal:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,.5); }
+  .btn-secundario { border: 1px solid var(--borda); background: var(--card); }
+  .btn-secundario:hover { background: rgba(255,255,255,.08); }
+
+  /* ====== MENU ====== */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    background: rgba(7,13,36,.75); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--borda);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-img { height: 52px; width: auto; display: block; }
+  .logo-texto { font-size: 1.15rem; font-weight: 700; letter-spacing: .02em; }
+  .nav-links { display: flex; gap: 28px; font-size: .95rem; color: var(--texto-suave); }
+  .nav-links a:hover { color: var(--texto); }
+  .nav .btn { padding: 10px 18px; font-size: .9rem; }
+
+  /* ====== HERO ====== */
+  .hero {
+    min-height: 100vh; display: flex; align-items: center; padding-top: 120px; position: relative;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(124,58,237,.35), transparent),
+      radial-gradient(ellipse 50% 50% at 10% 80%, rgba(36,81,214,.3), transparent),
+      var(--marinho-escuro);
+  }
+  .hero-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 48px; align-items: center; }
+  .hero h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); margin-bottom: 20px; }
+  .hero h1 span { background: var(--gradiente); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { font-size: 1.15rem; color: var(--texto-suave); max-width: 520px; margin-bottom: 36px; }
+  .hero-botoes { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero-monograma { display: flex; justify-content: center; }
+  .hero-monograma img { width: min(360px, 80vw); height: auto; filter: drop-shadow(0 20px 60px rgba(124,58,237,.45)); animation: flutuar 6s ease-in-out infinite; }
+  @keyframes flutuar { 50% { transform: translateY(-14px); } }
+
+  /* ====== FAIXA DE MARCAS ====== */
+  .marcas { padding: 56px 0; border-block: 1px solid var(--borda); background: var(--marinho); }
+  .marcas-titulo { text-align: center; color: var(--texto-suave); font-size: .9rem; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 32px; }
+  .carrossel {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  .carrossel-trilho { display: flex; gap: 72px; width: max-content; animation: rolar 28s linear infinite; }
+  .carrossel:hover .carrossel-trilho { animation-play-state: paused; }
+  @keyframes rolar { to { transform: translateX(-50%); } }
+  .marca {
+    display: flex; align-items: center; gap: 12px; opacity: .55; filter: grayscale(1);
+    transition: opacity .3s, filter .3s; white-space: nowrap;
+  }
+  .marca:hover { opacity: 1; filter: grayscale(0); }
+  /* Quando tiver o logo real: troque .marca-icone + .marca-nome por <img src="logo.png" alt="Nome"> */
+  .marca-icone {
+    width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
+    font-weight: 700; font-size: 1.1rem; color: #fff;
+  }
+  .marca-nome { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; }
+  .marca-vaga .marca-icone { border: 2px dashed var(--texto-suave); color: var(--texto-suave); }
+
+  /* ====== PORTFÓLIO ====== */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px; }
+  .projeto {
+    background: var(--card); border: 1px solid var(--borda); border-radius: 20px; overflow: hidden;
+    transition: transform .3s, border-color .3s;
+  }
+  .projeto:hover { transform: translateY(-6px); border-color: rgba(124,58,237,.5); }
+  .projeto-img {
+    height: 200px; display: grid; place-items: center; font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem; font-weight: 700; color: rgba(255,255,255,.9);
+  }
+  .projeto-corpo { padding: 24px; }
+  .projeto-corpo h3 { font-size: 1.3rem; margin-bottom: 8px; }
+  .projeto-corpo p { color: var(--texto-suave); font-size: .95rem; margin-bottom: 16px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: .75rem; padding: 5px 12px; border-radius: 999px; background: rgba(124,58,237,.15); color: var(--roxo-claro); }
+
+  /* ====== SERVIÇOS ====== */
+  .servicos { background: var(--marinho); }
+  .servico { background: var(--card); border: 1px solid var(--borda); border-radius: 20px; padding: 32px; }
+  .servico-icone {
+    width: 52px; height: 52px; border-radius: 14px; background: var(--gradiente);
+    display: grid; place-items: center; margin-bottom: 20px;
+  }
+  .servico-icone svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .servico h3 { font-size: 1.2rem; margin-bottom: 8px; }
+  .servico p { color: var(--texto-suave); font-size: .95rem; }
+
+  /* ====== PLANOS ====== */
+  .planos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px; max-width: 900px; margin-inline: auto; }
+  .plano {
+    background: var(--card); border: 1px solid var(--borda); border-radius: 24px; padding: 36px 32px;
+    display: flex; flex-direction: column; position: relative;
+  }
+  .plano.destaque { border: 1px solid transparent; background: linear-gradient(var(--marinho), var(--marinho)) padding-box, var(--gradiente) border-box; box-shadow: 0 20px 60px rgba(124,58,237,.25); }
+  .plano-selo { position: absolute; top: -13px; left: 32px; background: var(--gradiente); font-size: .75rem; font-weight: 600; padding: 5px 14px; border-radius: 999px; }
+  .plano h3 { font-size: 1.5rem; margin-bottom: 6px; }
+  .plano-desc { color: var(--texto-suave); font-size: .95rem; margin-bottom: 24px; }
+  .preco-linha { color: var(--texto-suave); font-size: .9rem; }
+  .preco { font-family: 'Space Grotesk', sans-serif; font-size: 2.4rem; font-weight: 700; line-height: 1.1; }
+  .preco small { font-size: 1rem; font-weight: 500; color: var(--texto-suave); }
+  .preco-extra { font-size: .95rem; margin: 6px 0 24px; color: var(--roxo-claro); font-weight: 600; }
+  .lista { list-style: none; margin-bottom: 32px; flex: 1; }
+  .lista li { padding: 8px 0 8px 30px; position: relative; font-size: .95rem; border-bottom: 1px solid var(--borda); }
+  .lista li:last-child { border-bottom: 0; }
+  .lista li::before { content: "✓"; position: absolute; left: 0; top: 8px; width: 20px; height: 20px; border-radius: 50%; background: rgba(124,58,237,.2); color: var(--roxo-claro); font-size: .7rem; display: grid; place-items: center; font-weight: 700; }
+  .lista li.nao { color: var(--texto-suave); }
+  .lista li.nao::before { content: "—"; background: rgba(255,255,255,.06); color: var(--texto-suave); }
+  .plano .btn { justify-content: center; }
+  .planos-nota { text-align: center; color: var(--texto-suave); font-size: .85rem; margin-top: 28px; }
+
+  /* ====== FAQ ====== */
+  .faq { max-width: 760px; margin: 48px auto 0; }
+  .faq details { border-bottom: 1px solid var(--borda); padding: 20px 0; }
+  .faq summary { cursor: pointer; font-weight: 600; font-size: 1.05rem; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; color: var(--roxo-claro); font-size: 1.4rem; line-height: 1; transition: transform .2s; }
+  .faq details[open] summary::after { transform: rotate(45deg); }
+  .faq details p { color: var(--texto-suave); margin-top: 12px; }
+
+  /* ====== COMO FUNCIONA ====== */
+  .passos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 48px; counter-reset: passo; }
+  .passo { position: relative; padding-top: 64px; }
+  .passo::before {
+    counter-increment: passo; content: "0" counter(passo);
+    position: absolute; top: 0; font-family: 'Space Grotesk', sans-serif; font-size: 2.6rem; font-weight: 700;
+    background: var(--gradiente); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .passo h3 { font-size: 1.15rem; margin-bottom: 6px; }
+  .passo p { color: var(--texto-suave); font-size: .95rem; }
+
+  /* ====== DEPOIMENTOS ====== */
+  .depoimentos { background: var(--marinho); }
+  .depoimento { background: var(--card); border: 1px solid var(--borda); border-radius: 20px; padding: 32px; }
+  .depoimento blockquote { font-size: 1.05rem; margin-bottom: 20px; }
+  .depoimento blockquote::before { content: "“"; display: block; font-size: 3rem; line-height: 1; color: var(--roxo); }
+  .autor { display: flex; align-items: center; gap: 12px; }
+  .autor-foto { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; }
+  .autor small { display: block; color: var(--texto-suave); }
+  .placeholder-aviso { font-size: .75rem; color: #f5b94a; margin-top: 16px; }
+
+  /* ====== CTA / CONTATO ====== */
+  .cta-caixa {
+    background: var(--gradiente); border-radius: 28px; padding: 64px 32px; text-align: center; position: relative; overflow: hidden;
+  }
+  .cta-caixa h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 12px; }
+  .cta-caixa p { opacity: .9; margin-bottom: 32px; }
+  .cta-caixa .btn { background: #fff; color: var(--marinho); }
+  .cta-caixa .btn:hover { transform: translateY(-2px); }
+
+  footer { padding: 40px 0; border-top: 1px solid var(--borda); color: var(--texto-suave); font-size: .9rem; }
+  .rodape { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .rodape-links { display: flex; gap: 20px; }
+  .rodape-links a:hover { color: var(--texto); }
+
+  /* ====== ANIMAÇÃO AO ROLAR ====== */
+  .revelar { opacity: 0; transform: translateY(30px); transition: opacity .7s, transform .7s; }
+  .revelar.visivel { opacity: 1; transform: none; }
+
+  /* ====== RESPONSIVO ====== */
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; text-align: center; }
+    .hero p { margin-inline: auto; }
+    .hero-botoes { justify-content: center; }
+    .hero-monograma { order: -1; }
+    .hero-monograma img { width: 200px; }
+    .nav-links { display: none; }
+    .passos { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 520px) {
+    .passos { grid-template-columns: 1fr; }
+    section { padding: 72px 0; }
+    .nav .btn { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a href="#" class="logo"><img src="logo.png" alt="Genova Forge" class="logo-img"></a>
+    <nav class="nav-links">
+      <a href="#projetos">Projetos</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#planos">Planos</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#contato">Contato</a>
+      <a href="contrato.html">Área do cliente</a>
+    </nav>
+    <a href="orcamento.html" class="btn btn-principal">Pedir orçamento</a>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="tag">Sites · Lojas · Sistemas</span>
+      <h1>Forjamos a presença digital do <span>seu negócio</span>.</h1>
+      <p>Sites, lojas virtuais e sistemas sob medida. A gente cria, coloca no ar e cuida de tudo pra você — hospedagem, domínio e manutenção num plano só.</p>
+      <div class="hero-botoes">
+        <a href="#planos" class="btn btn-principal">Ver planos →</a>
+        <a href="#projetos" class="btn btn-secundario">Ver projetos</a>
+      </div>
+    </div>
+    <div class="hero-monograma"><img src="icone.png" alt="" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ===== FAIXA DE MARCAS ===== -->
+<!-- Para adicionar uma marca: copie um bloco .marca no GRUPO 1 e repita igual no GRUPO 2 (é o que deixa o loop contínuo) -->
+<div class="marcas">
+  <p class="marcas-titulo">Marcas que confiam na Genova Forge</p>
+  <div class="carrossel">
+    <div class="carrossel-trilho">
+      <!-- GRUPO 1 -->
+      <div class="marca"><div class="marca-icone" style="background:#d9468f">LC</div><span class="marca-nome">Las Chicas Brechó</span></div>
+      <div class="marca"><div class="marca-icone" style="background:#1f1f1f">CD</div><span class="marca-nome">Personal Chef Douglas</span></div>
+      <div class="marca marca-vaga"><div class="marca-icone">+</div><span class="marca-nome">Sua marca aqui</span></div>
+      <div class="marca"><div class="marca-icone" style="background:#d9468f">LC</div><span class="marca-nome">Las Chicas Brechó</span></div>
+      <div class="marca"><div class="marca-icone" style="background:#1f1f1f">CD</div><span class="marca-nome">Personal Chef Douglas</span></div>
+      <div class="marca marca-vaga"><div class="marca-icone">+</div><span class="marca-nome">Sua marca aqui</span></div>
+      <!-- GRUPO 2 (cópia) -->
+      <div class="marca" aria-hidden="true"><div class="marca-icone" style="background:#d9468f">LC</div><span class="marca-nome">Las Chicas Brechó</span></div>
+      <div class="marca" aria-hidden="true"><div class="marca-icone" style="background:#1f1f1f">CD</div><span class="marca-nome">Personal Chef Douglas</span></div>
+      <div class="marca marca-vaga" aria-hidden="true"><div class="marca-icone">+</div><span class="marca-nome">Sua marca aqui</span></div>
+      <div class="marca" aria-hidden="true"><div class="marca-icone" style="background:#d9468f">LC</div><span class="marca-nome">Las Chicas Brechó</span></div>
+      <div class="marca" aria-hidden="true"><div class="marca-icone" style="background:#1f1f1f">CD</div><span class="marca-nome">Personal Chef Douglas</span></div>
+      <div class="marca marca-vaga" aria-hidden="true"><div class="marca-icone">+</div><span class="marca-nome">Sua marca aqui</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PORTFÓLIO ===== -->
+<section id="projetos">
+  <div class="container">
+    <span class="tag">Portfólio</span>
+    <h2 class="titulo-secao">Projetos que já saíram da forja</h2>
+    <p class="sub-secao">Cada projeto é feito sob medida pra realidade do cliente. Alguns dos trabalhos recentes:</p>
+    <div class="cards">
+      <article class="projeto revelar">
+        <!-- Troque o div abaixo por <img src="print-laschicas.png"> -->
+        <div class="projeto-img" style="background:linear-gradient(135deg,#d9468f,#7c3aed)">Las Chicas Brechó</div>
+        <div class="projeto-corpo">
+          <h3>Las Chicas Brechó</h3>
+          <p>Loja virtual de brechó com sacolinha, cadastro de clientes, frete integrado e e-mail automático de rastreio.</p>
+          <div class="chips"><span class="chip">E-commerce</span><span class="chip">SuperFrete</span><span class="chip">Banco de dados</span></div>
+        </div>
+      </article>
+      <article class="projeto revelar">
+        <div class="projeto-img" style="background:linear-gradient(135deg,#1f1f1f,#2451d6)">Personal Chef Douglas</div>
+        <div class="projeto-corpo">
+          <h3>Personal Chef Douglas</h3>
+          <p>Site portfólio com cardápio, apresentação do chef e identidade visual própria.</p>
+          <div class="chips"><span class="chip">Portfólio</span><span class="chip">Cardápio</span><span class="chip">Logo</span></div>
+        </div>
+      </article>
+      <article class="projeto revelar">
+        <div class="projeto-img" style="background:linear-gradient(135deg,#0b1437,#7c3aed)">Seu projeto?</div>
+        <div class="projeto-corpo">
+          <h3>O próximo pode ser o seu</h3>
+          <p>Tem uma ideia de site, loja ou sistema? Bora conversar e tirar ela do papel.</p>
+          <a href="orcamento.html" class="btn btn-secundario" style="padding:10px 18px;font-size:.9rem">Quero um orçamento</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERVIÇOS ===== -->
+<section id="servicos" class="servicos">
+  <div class="container">
+    <span class="tag">Serviços</span>
+    <h2 class="titulo-secao">O que a gente faz</h2>
+    <p class="sub-secao">Do site simples de apresentação ao sistema completo com banco de dados.</p>
+    <div class="cards">
+      <div class="servico revelar">
+        <div class="servico-icone"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 21h8"/></svg></div>
+        <h3>Sites e portfólios</h3>
+        <p>Páginas bonitas, rápidas e que funcionam bem no celular, pra apresentar você ou seu negócio.</p>
+      </div>
+      <div class="servico revelar">
+        <div class="servico-icone"><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg></div>
+        <h3>Lojas virtuais</h3>
+        <p>Catálogo, carrinho, cálculo de frete e pagamento — pra você vender online de verdade.</p>
+      </div>
+      <div class="servico revelar">
+        <div class="servico-icone"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></div>
+        <h3>Sistemas e estoque</h3>
+        <p>Sistemas de gestão, controle de estoque e cadastros feitos sob medida pro seu fluxo.</p>
+      </div>
+      <div class="servico revelar">
+        <div class="servico-icone"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
+        <h3>Automações</h3>
+        <p>E-mails automáticos, integrações e tarefas repetitivas rodando sozinhas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PLANOS ===== -->
+<!-- Para mudar os valores: edite os textos dentro de .preco e .preco-extra -->
+<section id="planos">
+  <div class="container">
+    <div style="text-align:center">
+      <span class="tag">Planos</span>
+      <h2 class="titulo-secao">Escolha como quer ter o seu site</h2>
+      <p class="sub-secao" style="margin-inline:auto">Você paga pela criação do site e escolhe: deixar tudo com a gente numa assinatura mensal, ou ficar com a hospedagem e o domínio por sua conta.</p>
+    </div>
+    <div class="planos-grid">
+      <div class="plano destaque revelar">
+        <span class="plano-selo">Recomendado</span>
+        <h3>Genova Hospeda</h3>
+        <p class="plano-desc">A gente cria, hospeda e cuida. Você não se preocupa com nada técnico.</p>
+        <span class="preco-linha">Criação do site a partir de</span>
+        <div class="preco">R$ 500</div>
+        <div class="preco-extra">+ R$ 49/mês de assinatura</div>
+        <ul class="lista">
+          <li>Hospedagem no servidor da Genova</li>
+          <li>Banco de dados incluso</li>
+          <li>Domínio configurado e mantido por nós</li>
+          <li>HTTPS (cadeado de segurança)</li>
+          <li>Backups e monitoramento</li>
+          <li>Pequenos ajustes e atualizações todo mês</li>
+          <li>Suporte direto com a gente</li>
+        </ul>
+        <a href="orcamento.html?plano=GENOVA_HOSPEDA" class="btn btn-principal">Quero esse plano</a>
+      </div>
+      <div class="plano revelar">
+        <h3>Independente</h3>
+        <p class="plano-desc">Você fica com a hospedagem, o banco e o domínio na sua conta. Sem mensalidade com a gente.</p>
+        <span class="preco-linha">Criação do site a partir de</span>
+        <div class="preco">R$ 500</div>
+        <div class="preco-extra">sem mensalidade</div>
+        <ul class="lista">
+          <li>Site entregue e publicado na sua hospedagem</li>
+          <li>A gente configura domínio e banco na sua conta</li>
+          <li>Código-fonte entregue pra você</li>
+          <li>30 dias de suporte após a entrega</li>
+          <li class="nao">Custos de domínio, hospedagem e banco por sua conta</li>
+          <li class="nao">Ajustes depois disso cobrados à parte</li>
+        </ul>
+        <a href="orcamento.html?plano=INDEPENDENTE" class="btn btn-secundario">Quero esse plano</a>
+      </div>
+    </div>
+    <p class="planos-nota">O valor final da criação depende do projeto (site simples, loja virtual ou sistema). O orçamento é gratuito.</p>
+
+    <div class="faq">
+      <details>
+        <summary>Qual a diferença entre os dois planos?</summary>
+        <p>No Genova Hospeda o site fica no nosso servidor e a gente cuida de tudo: hospedagem, banco de dados, domínio, segurança e ajustes, por uma assinatura mensal. No Independente, a hospedagem e o domínio ficam na sua conta e você paga direto pros serviços — a gente só cria e entrega.</p>
+      </details>
+      <details>
+        <summary>O domínio fica no meu nome?</summary>
+        <p>Sim. Em qualquer plano, o domínio (ex: seunegocio.com.br) é registrado no seu CPF ou CNPJ. Ele é seu.</p>
+      </details>
+      <details>
+        <summary>Posso trocar de plano depois?</summary>
+        <p>Pode. Se começar no Genova Hospeda e quiser migrar pra sua própria hospedagem, a gente ajuda na mudança. E o contrário também.</p>
+      </details>
+      <details>
+        <summary>Tem fidelidade na assinatura?</summary>
+        <p>Não. Você pode cancelar quando quiser, e a gente te ajuda a levar o site pra outro lugar.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COMO FUNCIONA ===== -->
+<section id="como-funciona">
+  <div class="container">
+    <span class="tag">Processo</span>
+    <h2 class="titulo-secao">Como funciona</h2>
+    <div class="passos">
+      <div class="passo revelar"><h3>Conversa</h3><p>Você conta a ideia e o que precisa. Sem compromisso.</p></div>
+      <div class="passo revelar"><h3>Proposta</h3><p>Montamos escopo, prazo e valor claros.</p></div>
+      <div class="passo revelar"><h3>Forja</h3><p>Desenvolvimento com prévias pra você acompanhar e ajustar.</p></div>
+      <div class="passo revelar"><h3>No ar</h3><p>Site publicado com domínio próprio — e, no plano Genova Hospeda, a gente segue cuidando todo mês.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DEPOIMENTOS: volta quando tiver os textos reais dos clientes ===== -->
+
+<!-- ===== CONTATO ===== -->
+<section id="contato">
+  <div class="container">
+    <div class="cta-caixa revelar">
+      <h2>Bora forjar o seu projeto?</h2>
+      <p>Faça seu pedido online em 2 minutos — ou chame a gente no Instagram.</p>
+      <!-- Quando tiver o número oficial: href="https://wa.me/55DDDNUMERO" -->
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="orcamento.html" class="btn">Pedir orçamento →</a>
+        <a href="https://instagram.com/genova_forge" target="_blank" class="btn" style="background:rgba(255,255,255,.15);color:#fff">Instagram</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container rodape">
+    <a href="#" class="logo"><img src="logo.png" alt="Genova Forge" style="height:38px;width:auto"></a>
+    <div class="rodape-links">
+      <a href="https://instagram.com/genova_forge" target="_blank">@genova_forge</a>
+      <a href="contrato.html">Área do cliente</a>
+          </div>
+    <span>© 2026 Genova Forge · São Paulo, SP</span>
+  </div>
+</footer>
+
+<script>
+  // Revela os elementos quando aparecem na tela
+  const obs = new IntersectionObserver(entradas => {
+    entradas.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visivel'); obs.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.revelar').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

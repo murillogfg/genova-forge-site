@@ -1,0 +1,82 @@
+/* Estilo compartilhado: assinar.html e admin.html */
+:root {
+  color-scheme: dark;
+  --roxo: #7c3aed;
+  --roxo-claro: #a78bfa;
+  --marinho: #0b1437;
+  --marinho-escuro: #070d24;
+  --royal: #1d6ff2;
+  --laranja: #f97316;
+  --texto: #e8ebf7;
+  --texto-suave: #a3abc9;
+  --card: rgba(255,255,255,0.04);
+  --borda: rgba(255,255,255,0.10);
+  --campo: rgba(255,255,255,0.06);
+  --ok: #34d399;
+  --alerta: #fbbf24;
+  --erro: #f87171;
+  --gradiente: linear-gradient(135deg, var(--roxo), var(--royal));
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background:
+    radial-gradient(ellipse 60% 40% at 85% 0%, rgba(124,58,237,.25), transparent),
+    radial-gradient(ellipse 50% 40% at 0% 100%, rgba(29,111,242,.2), transparent),
+    var(--marinho-escuro);
+  background-attachment: fixed;
+  color: var(--texto);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; line-height: 1.2; }
+a { color: var(--roxo-claro); }
+.container { width: min(1100px, 100% - 32px); margin-inline: auto; }
+
+.topo { border-bottom: 1px solid var(--borda); background: rgba(7,13,36,.7); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 20; }
+.topo .container { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 12px; }
+.topo img { height: 46px; width: auto; display: block; }
+.topo a.voltar { color: var(--texto-suave); text-decoration: none; font-size: .9rem; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 22px; border-radius: 12px; border: 1px solid transparent;
+  font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; color: var(--texto);
+  transition: transform .15s, opacity .15s, background .15s;
+}
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-principal { background: var(--gradiente); color: #fff; box-shadow: 0 8px 26px rgba(124,58,237,.3); }
+.btn-principal:not(:disabled):hover { transform: translateY(-1px); }
+.btn-sec { background: var(--card); border-color: var(--borda); }
+.btn-sec:hover { background: rgba(255,255,255,.08); }
+.btn-perigo { background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.35); color: #fecaca; }
+.btn-peq { padding: 7px 12px; font-size: .85rem; border-radius: 9px; }
+
+label { display: block; font-size: .88rem; font-weight: 500; margin-bottom: 6px; color: var(--texto-suave); }
+input, select, textarea {
+  width: 100%; font: inherit; color: var(--texto); background: var(--campo);
+  border: 1px solid var(--borda); border-radius: 10px; padding: 11px 13px; outline: none;
+}
+select option { background: var(--marinho); }
+input:focus, select:focus, textarea:focus { border-color: var(--roxo-claro); box-shadow: 0 0 0 3px rgba(167,139,250,.2); }
+textarea { resize: vertical; min-height: 110px; }
+.campo { margin-bottom: 16px; }
+.campo .msg-erro { color: var(--erro); font-size: .8rem; margin-top: 5px; display: none; }
+.campo.invalido input, .campo.invalido select, .campo.invalido textarea { border-color: var(--erro); }
+.campo.invalido .msg-erro { display: block; }
+.linha { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .linha { grid-template-columns: 1fr; } }
+
+.card { background: var(--card); border: 1px solid var(--borda); border-radius: 18px; padding: 24px; }
+.aviso { padding: 12px 16px; border-radius: 12px; font-size: .92rem; margin-bottom: 16px; }
+.aviso.erro { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.35); color: #fecaca; }
+.aviso.ok { background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.35); color: #a7f3d0; }
+.aviso.info { background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.3); color: #ddd6fe; }
+.escondido { display: none !important; }
+
+.selo { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .75rem; font-weight: 600; white-space: nowrap; }
+.s-SOLICITADA { background: rgba(167,139,250,.18); color: #c4b5fd; }
+.s-AGUARDANDO_PAGAMENTO, .s-PENDENTE { background: rgba(251,191,36,.15); color: #fde68a; }
+.s-ATIVA, .s-PAGA { background: rgba(52,211,153,.15); color: #6ee7b7; }
+.s-ATRASADA, .s-VENCIDA { background: rgba(248,113,113,.15); color: #fca5a5; }
+.s-CANCELADA, .s-RECUSADA, .s-REMOVIDA, .s-ESTORNADA { background: rgba(255,255,255,.08); color: var(--texto-suave); }

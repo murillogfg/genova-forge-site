@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Área do cliente — Genova Forge</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+  main { padding: 40px 0 80px; }
+  #entrar { max-width: 420px; margin: 32px auto; }
+  #entrar h1 { font-size: 1.6rem; margin-bottom: 6px; }
+  #entrar p { color: var(--texto-suave); margin-bottom: 20px; font-size: .95rem; }
+  .cab-contrato { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .cab-contrato h1 { font-size: clamp(1.5rem, 4vw, 2rem); }
+  .cab-contrato .num { font-family: 'Space Grotesk', sans-serif; color: var(--roxo-claro); letter-spacing: .04em; }
+  .grade { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .grade { grid-template-columns: 1fr; } }
+  .bloco { margin-bottom: 24px; }
+  .bloco h2 { font-size: 1.15rem; margin-bottom: 14px; }
+  .valores { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .valor { background: rgba(255,255,255,.03); border: 1px solid var(--borda); border-radius: 14px; padding: 14px; }
+  .valor small { color: var(--texto-suave); font-size: .8rem; display: block; }
+  .valor strong { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+  .valor .det { font-size: .8rem; color: var(--texto-suave); }
+  .escopo { white-space: pre-wrap; background: rgba(255,255,255,.03); border-radius: 12px; padding: 14px; font-size: .93rem; }
+  .termos { padding-left: 18px; color: var(--texto-suave); font-size: .9rem; }
+  .termos li { margin-bottom: 8px; }
+  .formas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  @media (max-width: 520px) { .formas { grid-template-columns: 1fr 1fr; } }
+  .forma { position: relative; }
+  .forma input { position: absolute; opacity: 0; pointer-events: none; }
+  .forma span { display: block; text-align: center; padding: 12px 6px; border: 1px solid var(--borda); border-radius: 10px; font-size: .9rem; cursor: pointer; background: var(--card); }
+  .forma input:checked + span { border-color: var(--roxo-claro); background: rgba(124,58,237,.14); }
+  .forma input:focus-visible + span { outline: 2px solid var(--roxo-claro); }
+  .aceite { display: flex; gap: 10px; align-items: flex-start; font-size: .92rem; margin: 14px 0; color: var(--texto); }
+  .aceite input { width: 20px; height: 20px; margin-top: 2px; flex: none; }
+  .lista-cob { display: grid; gap: 8px; }
+  .cob { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--borda); border-radius: 12px; }
+  .cob .valor-cob { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+  .cob .meta { font-size: .82rem; color: var(--texto-suave); }
+  .pix { display: grid; grid-template-columns: 160px 1fr; gap: 16px; align-items: center; }
+  .pix img { width: 160px; height: 160px; background: #fff; border-radius: 12px; padding: 8px; }
+  .pix textarea { min-height: 70px; font-size: .78rem; font-family: ui-monospace, monospace; }
+  @media (max-width: 520px) { .pix { grid-template-columns: 1fr; justify-items: center; } }
+  .chamado { padding: 14px; border: 1px solid var(--borda); border-radius: 12px; margin-bottom: 10px; }
+  .chamado .resp { margin-top: 10px; padding: 10px 12px; background: rgba(52,211,153,.08); border-left: 3px solid var(--ok); border-radius: 8px; font-size: .9rem; white-space: pre-wrap; }
+  .s-AGUARDANDO_ACEITE { background: rgba(167,139,250,.18); color: #c4b5fd; }
+  .s-ATIVO { background: rgba(52,211,153,.15); color: #6ee7b7; }
+  .s-ATRASADO { background: rgba(248,113,113,.15); color: #fca5a5; }
+  .s-CANCELADO { background: rgba(255,255,255,.08); color: var(--texto-suave); }
+  .s-ABERTO { background: rgba(167,139,250,.18); color: #c4b5fd; }
+  .s-EM_ANDAMENTO { background: rgba(251,191,36,.15); color: #fde68a; }
+  .s-RESOLVIDO { background: rgba(52,211,153,.15); color: #6ee7b7; }
+  .s-FECHADO { background: rgba(255,255,255,.08); color: var(--texto-suave); }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="container">
+    <a href="index.html"><img src="logo.png" alt="Genova Forge"></a>
+    <button class="btn btn-sec btn-peq escondido" id="sair">Sair</button>
+  </div>
+</header>
+
+<main class="container">
+  <!-- ===== acesso ===== -->
+  <form id="entrar" class="card" novalidate>
+    <h1>Área do cliente</h1>
+    <p>Digite o número do contrato que a gente te enviou e o seu CPF ou CNPJ.</p>
+    <div id="entrar-erro" class="aviso erro escondido" role="alert"></div>
+    <div class="campo"><label for="numero">Número do contrato</label><input id="numero" placeholder="GF-2026-0002" autocomplete="off" required style="text-transform:uppercase"></div>
+    <div class="campo"><label for="doc">CPF ou CNPJ</label><input id="doc" inputmode="numeric" placeholder="000.000.000-00" maxlength="18" required></div>
+    <button class="btn btn-principal" style="width:100%" id="btn-entrar">Ver meu contrato</button>
+    <p style="margin:14px 0 0;font-size:.85rem">Ainda não é cliente? <a href="orcamento.html">Peça um orçamento</a>.</p>
+  </form>
+
+  <!-- ===== contrato ===== -->
+  <section id="painel" class="escondido" aria-live="polite"></section>
+</main>
+
+<div id="toast" class="aviso escondido" role="status" aria-live="polite" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:50;min-width:260px;text-align:center"></div>
+
+<script src="config.js"></script>
+<script src="comum.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const { brl, data, esc } = G;
+  const STATUS = { AGUARDANDO_ACEITE: 'Aguardando sua confirmação', AGUARDANDO_PAGAMENTO: 'Aguardando pagamento', ATIVO: 'Ativo',
+    ATRASADO: 'Pagamento em atraso', CANCELADO: 'Encerrado', PENDENTE: 'Pendente', PAGA: 'Pago', VENCIDA: 'Vencido',
+    ESTORNADA: 'Estornado', ABERTO: 'Aberto', EM_ANDAMENTO: 'Em andamento', RESOLVIDO: 'Resolvido', FECHADO: 'Fechado' };
+  const FORMAS = { PIX: 'Pix', BOLETO: 'Boleto', CREDIT_CARD: 'Cartão de crédito', UNDEFINED: 'Escolher na fatura' };
+  const selo = s => `<span class="selo s-${s}">${STATUS[s] || s}</span>`;
+  let acesso = null, atual = null;
+
+  function toast(msg, tipo = 'ok') {
+    const t = $('#toast'); t.className = 'aviso ' + tipo; t.textContent = msg;
+    clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add('escondido'), 4500);
+  }
+
+  // ---------- acesso ----------
+  G.mascaraDoc($('#doc'));
+  const salvo = (() => { try { return JSON.parse(sessionStorage.getItem('genova-contrato')); } catch (e) { return null; } })();
+  const numUrl = new URLSearchParams(location.search).get('n');
+  if (numUrl) $('#numero').value = numUrl.toUpperCase();
+
+  $('#entrar').addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = $('#entrar-erro'); err.classList.add('escondido');
+    const numero = $('#numero').value.trim().toUpperCase(), cpfCnpj = G.so($('#doc').value);
+    if (!numero || !G.docValido(cpfCnpj)) { err.textContent = 'Confira o número do contrato e o CPF/CNPJ.'; err.classList.remove('escondido'); return; }
+    await entrar({ numero, cpfCnpj }, err);
+  });
+
+  async function entrar(cred, err) {
+    const btn = $('#btn-entrar'); btn.disabled = true;
+    try {
+      const c = await G.post('/api/portal/acesso', cred);
+      acesso = cred;
+      try { sessionStorage.setItem('genova-contrato', JSON.stringify(cred)); } catch (e) {}
+      mostrar(c);
+    } catch (ex) {
+      if (err) { err.textContent = ex.message === 'Failed to fetch' ? G.ERRO_REDE : ex.message; err.classList.remove('escondido'); }
+    } finally { btn.disabled = false; }
+  }
+  $('#sair').onclick = () => {
+    acesso = null; try { sessionStorage.removeItem('genova-contrato'); } catch (e) {}
+    $('#painel').classList.add('escondido'); $('#entrar').classList.remove('escondido'); $('#sair').classList.add('escondido');
+  };
+  if (salvo && salvo.numero) entrar(salvo, null);
+
+  // ---------- tela do contrato ----------
+  function mostrar(c) {
+    atual = c;
+    $('#entrar').classList.add('escondido'); $('#sair').classList.remove('escondido');
+    const p = $('#painel'); p.classList.remove('escondido');
+    const temMensal = Number(c.valorMensal) > 0;
+    const inicioMensal = c.inicioMensalidade ? 'a partir de ' + data(c.inicioMensalidade) : '30 dias após a entrega';
+
+    p.innerHTML = `
+      <div class="cab-contrato">
+        <div>
+          <div class="num">${esc(c.numero)}</div>
+          <h1>Olá, ${esc(c.cliente)}!</h1>
+          <div class="muted" style="color:var(--texto-suave)">${esc(c.tipoSite)} · Plano ${esc(c.planoNome)}</div>
+        </div>
+        ${selo(c.status)}
+      </div>
+      <div class="grade">
+        <div>
+          <div class="card bloco">
+            <h2>Resumo do contrato</h2>
+            <div class="valores">
+              <div class="valor"><small>Criação do site</small><strong>${brl(c.valorCriacao)}</strong>
+                <div class="det">${c.parcelasMaxCartao > 1 ? 'em até ' + c.parcelasMaxCartao + 'x no cartão' : 'à vista'}</div></div>
+              <div class="valor"><small>Mensalidade</small><strong>${temMensal ? brl(c.valorMensal) : 'Sem'}</strong>
+                <div class="det">${temMensal ? inicioMensal : 'domínio e hospedagem por sua conta'}</div></div>
+            </div>
+            <h3 style="font-size:.95rem;margin-bottom:8px">O que está incluso</h3>
+            <div class="escopo">${esc(c.escopo)}</div>
+            ${c.dataEntrega ? `<p style="margin-top:14px;font-size:.9rem;color:var(--texto-suave)">Site entregue em <strong style="color:var(--texto)">${data(c.dataEntrega)}</strong> · suporte de ajustes até <strong style="color:var(--texto)">${data(c.garantiaAte)}</strong></p>` : ''}
+          </div>
+          <div class="card bloco">
+            <h2>Termos</h2>
+            <ol class="termos">${c.termos.map(t => `<li>${esc(t)}</li>`).join('')}</ol>
+            ${c.aceiteEm ? `<p style="font-size:.85rem;color:var(--ok);margin-top:8px">✓ Aceito em ${G.dataHora(c.aceiteEm)}</p>` : ''}
+          </div>
+        </div>
+        <div>
+          ${c.status === 'AGUARDANDO_ACEITE' ? blocoConfirmar(c) : blocoPagamentos(c)}
+          ${c.status === 'AGUARDANDO_ACEITE' ? '' : blocoChamados(c)}
+        </div>
+      </div>`;
+    ligar(c);
+  }
+
+  function blocoConfirmar(c) {
+    const parcelas = Array.from({ length: c.parcelasMaxCartao }, (_, i) => i + 1)
+      .map(n => `<option value="${n}">${n}x de ${brl(c.valorCriacao / n)}${n === 1 ? ' (à vista)' : ''}</option>`).join('');
+    return `
+      <form class="card bloco" id="form-confirmar">
+        <h2>Confirmar e pagar</h2>
+        <div id="conf-erro" class="aviso erro escondido" role="alert"></div>
+        <label style="margin-bottom:8px">Como prefere pagar?</label>
+        <div class="formas">
+          <label class="forma"><input type="radio" name="forma" value="PIX" checked><span>Pix</span></label>
+          <label class="forma"><input type="radio" name="forma" value="CREDIT_CARD"><span>Cartão</span></label>
+          <label class="forma"><input type="radio" name="forma" value="BOLETO"><span>Boleto</span></label>
+          <label class="forma"><input type="radio" name="forma" value="UNDEFINED"><span>Decido na fatura</span></label>
+        </div>
+        <div class="campo escondido" id="campo-parcelas"><label for="parcelas">Parcelas</label><select id="parcelas">${parcelas}</select></div>
+        <label class="aceite"><input type="checkbox" id="aceito"> <span>Li e aceito os termos e o que está incluso neste contrato.</span></label>
+        <button class="btn btn-principal" style="width:100%" id="btn-confirmar" disabled>Confirmar contrato</button>
+        <p style="font-size:.8rem;color:var(--texto-suave);margin-top:10px">O pagamento é processado pelo Asaas. Dados do cartão não passam pelo nosso site.</p>
+      </form>`;
+  }
+
+  function blocoPagamentos(c) {
+    const cobs = c.cobrancas.length ? c.cobrancas.map(x => `
+      <div class="cob">
+        <div><strong>${x.tipo === 'CRIACAO' ? 'Criação do site' + (x.parcela ? ` · parcela ${x.parcela}` : '') : 'Mensalidade'}</strong>
+          <div class="meta">${x.dataPagamento ? 'Pago em ' + data(x.dataPagamento) : 'Vence ' + data(x.vencimento)}</div></div>
+        <div class="valor-cob">${brl(x.valor)}<div>${selo(x.status)}</div></div>
+        ${x.linkFatura && x.status !== 'PAGA' ? `<a class="btn btn-sec btn-peq" style="grid-column:1/-1" href="${esc(x.linkFatura)}" target="_blank" rel="noopener">Abrir fatura / pagar</a>` : ''}
+      </div>`).join('') : '<p class="muted" style="color:var(--texto-suave)">Nenhuma cobrança ainda.</p>';
+    const pix = c.pix ? `
+      <div class="card bloco">
+        <h2>Pagar com Pix</h2>
+        <div class="pix">
+          ${c.pix.imagemBase64 ? `<img src="data:image/png;base64,${esc(c.pix.imagemBase64)}" alt="QR Code Pix">` : ''}
+          <div style="width:100%">
+            <p style="font-size:.9rem;margin-bottom:8px">${brl(c.pix.valor)} · vence ${data(c.pix.vencimento)}</p>
+            <textarea readonly id="pix-codigo" aria-label="Pix copia e cola">${esc(c.pix.copiaECola)}</textarea>
+            <button class="btn btn-principal btn-peq" style="margin-top:8px;width:100%" id="copiar-pix">Copiar código Pix</button>
+          </div>
+        </div>
+      </div>` : '';
+    return `${pix}
+      <div class="card bloco">
+        <h2>Pagamentos</h2>
+        ${c.formaPagamento ? `<p style="font-size:.88rem;color:var(--texto-suave);margin-bottom:12px">Forma escolhida: ${FORMAS[c.formaPagamento] || c.formaPagamento}. As cobranças também chegam no seu e-mail.</p>` : ''}
+        <div class="lista-cob">${cobs}</div>
+      </div>`;
+  }
+
+  function blocoChamados(c) {
+    const lista = c.chamados.map(ch => `
+      <div class="chamado">
+        <div style="display:flex;justify-content:space-between;gap:8px"><strong>${esc(ch.titulo)}</strong>${selo(ch.status)}</div>
+        <div style="font-size:.8rem;color:var(--texto-suave)">${G.dataHora(ch.criadoEm)}</div>
+        <p style="font-size:.9rem;margin-top:6px;white-space:pre-wrap">${esc(ch.descricao)}</p>
+        ${ch.resposta ? `<div class="resp"><strong>Genova:</strong> ${esc(ch.resposta)}</div>` : ''}
+      </div>`).join('');
+    const form = c.suporte.podeAbrir ? `
+      <form id="form-chamado" novalidate>
+        <div id="ch-erro" class="aviso erro escondido" role="alert"></div>
+        <div class="campo"><label for="ch-titulo">Assunto</label><input id="ch-titulo" maxlength="150" placeholder="Ex: trocar fotos da página inicial"></div>
+        <div class="campo"><label for="ch-desc">Descreva o que precisa</label><textarea id="ch-desc" maxlength="3000"></textarea></div>
+        <div class="campo"><label for="ch-prio">Urgência</label>
+          <select id="ch-prio"><option value="NORMAL">Normal</option><option value="BAIXA">Pode esperar</option><option value="URGENTE">Urgente (site com problema)</option></select></div>
+        <button class="btn btn-principal" style="width:100%" id="btn-chamado">Abrir chamado</button>
+      </form>` : `<div class="aviso info">${esc(c.suporte.motivo)}</div>`;
+    return `
+      <div class="card bloco">
+        <h2>Suporte</h2>
+        ${c.suporte.podeAbrir && c.suporte.origem === 'GARANTIA' ? `<p style="font-size:.85rem;color:var(--texto-suave);margin-bottom:12px">Você está no período de suporte pós-entrega (até ${data(c.garantiaAte)}).</p>` : ''}
+        ${form}
+        ${lista ? `<h3 style="font-size:.95rem;margin:18px 0 10px">Seus chamados</h3>${lista}` : ''}
+      </div>`;
+  }
+
+  function ligar(c) {
+    const fc = $('#form-confirmar');
+    if (fc) {
+      const aceito = $('#aceito'), btn = $('#btn-confirmar');
+      aceito.onchange = () => btn.disabled = !aceito.checked;
+      fc.querySelectorAll('input[name=forma]').forEach(r => r.onchange = () =>
+        $('#campo-parcelas').classList.toggle('escondido', !(r.checked && r.value === 'CREDIT_CARD' && c.parcelasMaxCartao > 1)));
+      fc.onsubmit = async e => {
+        e.preventDefault();
+        btn.disabled = true; btn.textContent = 'Gerando cobrança...';
+        const forma = fc.querySelector('input[name=forma]:checked').value;
+        try {
+          const novo = await G.post('/api/portal/confirmar', { ...acesso, aceito: true, formaPagamento: forma,
+            parcelas: forma === 'CREDIT_CARD' ? Number($('#parcelas').value) : 1 });
+          mostrar(novo);
+          toast('Contrato confirmado! A cobrança também foi enviada pro seu e-mail.');
+          const primeira = novo.cobrancas.find(x => x.status === 'PENDENTE' && x.linkFatura);
+          if (forma !== 'PIX' && primeira) window.open(primeira.linkFatura, '_blank', 'noopener');
+        } catch (ex) {
+          const err = $('#conf-erro'); err.textContent = ex.message === 'Failed to fetch' ? G.ERRO_REDE : ex.message; err.classList.remove('escondido');
+          btn.disabled = false; btn.textContent = 'Confirmar contrato';
+        }
+      };
+    }
+    const cp = $('#copiar-pix');
+    if (cp) cp.onclick = async () => {
+      try { await navigator.clipboard.writeText($('#pix-codigo').value); toast('Código Pix copiado!'); }
+      catch (e) { $('#pix-codigo').select(); toast('Selecionei o código: é só copiar.', 'info'); }
+    };
+    const fch = $('#form-chamado');
+    if (fch) fch.onsubmit = async e => {
+      e.preventDefault();
+      const titulo = $('#ch-titulo').value.trim(), descricao = $('#ch-desc').value.trim(), prioridade = $('#ch-prio').value;
+      const err = $('#ch-erro');
+      if (!titulo || !descricao) { err.textContent = 'Preencha o assunto e a descrição.'; err.classList.remove('escondido'); return; }
+      const btn = $('#btn-chamado'); btn.disabled = true;
+      try {
+        const novo = await G.post('/api/portal/chamados', { ...acesso, titulo, descricao, prioridade });
+        mostrar(novo);
+        toast('Chamado aberto! A gente te responde por aqui.');
+        if (window.GENOVA_WHATSAPP) {
+          const msg = `*Novo chamado — ${atual.numero}*\n*Cliente:* ${atual.cliente}\n*Urgência:* ${prioridade}\n*Assunto:* ${titulo}\n\n${descricao}`;
+          setTimeout(() => { if (confirm('Quer avisar a Genova pelo WhatsApp também?')) location.href = G.linkWhats(msg); }, 400);
+        }
+      } catch (ex) {
+        err.textContent = ex.message === 'Failed to fetch' ? G.ERRO_REDE : ex.message; err.classList.remove('escondido'); btn.disabled = false;
+      }
+    };
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel — Genova Forge</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+  :root { --serie-entrada: #4f8ff7; --serie-despesa: #e8650f; }
+  #login { min-height: calc(100vh - 68px); display: grid; place-items: center; padding: 24px 0; }
+  #login .card { width: min(380px, 100%); }
+  #login h1 { font-size: 1.4rem; margin-bottom: 18px; }
+
+  .abas { display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--borda); margin: 24px 0; scrollbar-width: thin; }
+  .aba { background: none; border: 0; color: var(--texto-suave); font: inherit; font-weight: 600; padding: 12px 14px; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .aba[aria-selected="true"] { color: var(--texto); border-bottom-color: var(--roxo-claro); }
+  .aba .cont { background: var(--roxo); color: #fff; border-radius: 999px; font-size: .72rem; padding: 1px 7px; margin-left: 4px; }
+  .barra { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+  .barra h2 { font-size: 1.3rem; margin-right: auto; }
+  .barra input, .barra select { width: auto; padding: 8px 12px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .kpi { background: var(--card); border: 1px solid var(--borda); border-radius: 16px; padding: 16px; }
+  .kpi small { color: var(--texto-suave); font-size: .8rem; display: block; }
+  .kpi strong { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; display: block; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi .det { font-size: .78rem; color: var(--texto-suave); margin-top: 2px; }
+  .kpi.destaque { background: linear-gradient(var(--marinho), var(--marinho)) padding-box, var(--gradiente) border-box; border-color: transparent; }
+  .kpi.alerta strong { color: var(--erro); }
+  .kpi.bom strong { color: var(--ok); }
+
+  .graf-card { background: var(--card); border: 1px solid var(--borda); border-radius: 16px; padding: 18px; margin-bottom: 20px; position: relative; }
+  .graf-cab { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+  .graf-cab h3 { font-size: 1.05rem; }
+  .legenda { display: flex; gap: 16px; font-size: .82rem; color: var(--texto-suave); }
+  .legenda i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  #grafico svg { width: 100%; height: 260px; display: block; }
+  #grafico .eixo { fill: var(--texto-suave); font-size: 11px; font-family: Inter, sans-serif; }
+  #grafico .grade-linha { stroke: rgba(255,255,255,.07); }
+  #grafico .alvo { fill: transparent; cursor: default; }
+  #grafico .alvo:hover, #grafico .alvo.ativo { fill: rgba(255,255,255,.04); }
+  .tooltip { position: absolute; pointer-events: none; background: var(--marinho-escuro); border: 1px solid var(--borda); border-radius: 10px; padding: 10px 12px; font-size: .82rem; min-width: 170px; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+  .tooltip .l { display: flex; justify-content: space-between; gap: 14px; font-variant-numeric: tabular-nums; }
+  .tooltip i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; }
+  .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .duas { grid-template-columns: 1fr; } }
+
+  .tabela-wrap { overflow-x: auto; border: 1px solid var(--borda); border-radius: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  th { text-align: left; font-weight: 600; color: var(--texto-suave); font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; padding: 11px 12px; background: rgba(255,255,255,.03); white-space: nowrap; }
+  td { padding: 11px 12px; border-top: 1px solid var(--borda); vertical-align: top; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.clicavel { cursor: pointer; }
+  tr.clicavel:hover td { background: rgba(255,255,255,.03); }
+  .vazio { text-align: center; color: var(--texto-suave); padding: 32px; }
+  .muted { color: var(--texto-suave); font-size: .82rem; }
+  .acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+  .lista { display: grid; gap: 12px; }
+  .item h3 { font-size: 1.05rem; }
+  .item .obs { margin-top: 10px; padding: 12px; background: rgba(255,255,255,.03); border-radius: 10px; font-size: .9rem; white-space: pre-wrap; }
+  .item-cab { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+
+  dialog { margin: auto; border: 1px solid var(--borda); border-radius: 18px; background: var(--marinho); color: var(--texto); padding: 0; width: min(680px, calc(100% - 24px)); max-height: calc(100vh - 24px); }
+  dialog::backdrop { background: rgba(3,6,18,.72); backdrop-filter: blur(3px); }
+  dialog .cab { padding: 18px 22px; border-bottom: 1px solid var(--borda); display: flex; justify-content: space-between; align-items: center; gap: 12px; position: sticky; top: 0; background: var(--marinho); z-index: 1; }
+  dialog .cab h2 { font-size: 1.15rem; }
+  dialog .corpo { padding: 18px 22px; }
+  dialog .rodape { padding: 14px 22px; border-top: 1px solid var(--borda); display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; position: sticky; bottom: 0; background: var(--marinho); }
+  dialog th, dialog td { padding: 9px 10px; }
+  .fechar { background: none; border: 0; color: var(--texto-suave); font-size: 1.5rem; cursor: pointer; line-height: 1; }
+  .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: .9rem; margin-bottom: 16px; }
+  .info-grid dt { color: var(--texto-suave); }
+  .secao { margin-top: 20px; }
+  .secao h3 { font-size: .95rem; margin-bottom: 10px; }
+  .caixa-acao { background: rgba(255,255,255,.03); border: 1px solid var(--borda); border-radius: 12px; padding: 14px; margin-top: 10px; }
+  .numero-grande { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; color: var(--roxo-claro); letter-spacing: .04em; }
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; min-width: 260px; max-width: calc(100% - 32px); text-align: center; }
+  .btn-whats { background: rgba(37,211,102,.14); border-color: rgba(37,211,102,.4); color: #86efac; }
+
+  .s-NOVO, .s-AGUARDANDO_ACEITE, .s-ABERTO { background: rgba(167,139,250,.18); color: #c4b5fd; }
+  .s-EM_CONTATO, .s-EM_ANDAMENTO, .s-AGUARDANDO_PAGAMENTO { background: rgba(251,191,36,.15); color: #fde68a; }
+  .s-CONVERTIDO, .s-ATIVO, .s-RESOLVIDO { background: rgba(52,211,153,.15); color: #6ee7b7; }
+  .s-ATRASADO, .s-URGENTE { background: rgba(248,113,113,.15); color: #fca5a5; }
+  .s-DESCARTADO, .s-CANCELADO, .s-FECHADO { background: rgba(255,255,255,.08); color: var(--texto-suave); }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="container">
+    <a href="index.html"><img src="logo.png" alt="Genova Forge"></a>
+    <div id="usuario" class="escondido" style="display:flex;gap:12px;align-items:center">
+      <span class="muted" id="usuario-nome"></span>
+      <button class="btn btn-sec btn-peq" id="sair">Sair</button>
+    </div>
+  </div>
+</header>
+
+<section id="login" class="container">
+  <form class="card" id="form-login">
+    <h1>Painel Genova</h1>
+    <div id="login-erro" class="aviso erro escondido" role="alert"></div>
+    <div class="campo"><label for="l-user">Usuário</label><input id="l-user" autocomplete="username" required></div>
+    <div class="campo"><label for="l-pass">Senha</label><input id="l-pass" type="password" autocomplete="current-password" required></div>
+    <button class="btn btn-principal" style="width:100%" id="btn-login">Entrar</button>
+  </form>
+</section>
+
+<main id="app" class="container escondido" style="padding-bottom:64px">
+  <nav class="abas" role="tablist">
+    <button class="aba" role="tab" data-aba="dashboard" aria-selected="true">Dashboard</button>
+    <button class="aba" role="tab" data-aba="orcamentos" aria-selected="false">Orçamentos <span class="cont escondido" id="cont-orc"></span></button>
+    <button class="aba" role="tab" data-aba="contratos" aria-selected="false">Contratos</button>
+    <button class="aba" role="tab" data-aba="chamados" aria-selected="false">Chamados <span class="cont escondido" id="cont-ch"></span></button>
+    <button class="aba" role="tab" data-aba="cobrancas" aria-selected="false">Cobranças</button>
+    <button class="aba" role="tab" data-aba="despesas" aria-selected="false">Despesas</button>
+    <button class="aba" role="tab" data-aba="config" aria-selected="false">Configurações</button>
+  </nav>
+
+  <!-- ===== Dashboard ===== -->
+  <section data-painel="dashboard">
+    <div class="barra">
+      <h2>Finanças da Genova</h2>
+      <input type="month" id="mes-dash" aria-label="Mês">
+      <button class="btn btn-sec btn-peq" id="baixar-csv">Baixar CSV do mês</button>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="graf-card">
+      <div class="graf-cab">
+        <h3>Entradas × despesas (12 meses)</h3>
+        <div class="legenda"><span><i style="background:var(--serie-entrada)"></i>Entradas (líquido)</span><span><i style="background:var(--serie-despesa)"></i>Despesas</span>
+          <button class="btn btn-sec btn-peq" id="ver-tabela">Ver tabela</button></div>
+      </div>
+      <div id="grafico"></div>
+      <div id="tabela-graf" class="tabela-wrap escondido" style="margin-top:10px"></div>
+      <div class="tooltip escondido" id="tip"></div>
+    </div>
+    <div class="duas">
+      <div class="card"><h3 style="font-size:1rem;margin-bottom:12px">Clientes que mais pagaram</h3><div id="top-clientes"></div></div>
+      <div class="card"><h3 style="font-size:1rem;margin-bottom:12px">Despesas do mês por categoria</h3><div id="desp-cat"></div></div>
+    </div>
+  </section>
+
+  <!-- ===== Orçamentos ===== -->
+  <section data-painel="orcamentos" class="escondido">
+    <div class="barra">
+      <h2>Fichas de orçamento</h2>
+      <select id="filtro-orc" aria-label="Filtrar"><option value="NOVO">Novos</option><option value="EM_CONTATO">Em contato</option><option value="CONVERTIDO">Viraram contrato</option><option value="DESCARTADO">Descartados</option><option value="">Todos</option></select>
+    </div>
+    <div class="lista" id="lista-orc"></div>
+  </section>
+
+  <!-- ===== Contratos ===== -->
+  <section data-painel="contratos" class="escondido">
+    <div class="barra">
+      <h2>Contratos e clientes</h2>
+      <select id="filtro-ct" aria-label="Filtrar status">
+        <option value="">Todos</option><option value="AGUARDANDO_ACEITE">Aguardando aceite</option><option value="AGUARDANDO_PAGAMENTO">Aguardando pagamento</option>
+        <option value="ATIVO">Ativos</option><option value="ATRASADO">Atrasados</option><option value="CANCELADO">Cancelados</option>
+      </select>
+      <button class="btn btn-principal btn-peq" id="novo-contrato">+ Novo contrato</button>
+    </div>
+    <div class="tabela-wrap"><table>
+      <thead><tr><th>Contrato</th><th>Cliente</th><th>Plano</th><th>Status</th><th class="num">Criação</th><th class="num">Mensal</th><th>Entrega</th></tr></thead>
+      <tbody id="tb-contratos"></tbody>
+    </table></div>
+  </section>
+
+  <!-- ===== Chamados ===== -->
+  <section data-painel="chamados" class="escondido">
+    <div class="barra">
+      <h2>Chamados de suporte</h2>
+      <select id="filtro-ch" aria-label="Filtrar"><option value="true">Em aberto</option><option value="false">Todos</option></select>
+    </div>
+    <div class="lista" id="lista-ch"></div>
+  </section>
+
+  <!-- ===== Cobranças ===== -->
+  <section data-painel="cobrancas" class="escondido">
+    <div class="barra"><h2>Cobranças por vencimento</h2><input type="month" id="mes-cob" aria-label="Mês"></div>
+    <div class="tabela-wrap"><table>
+      <thead><tr><th>Vencimento</th><th>Contrato</th><th>Cliente</th><th>Tipo</th><th>Status</th><th class="num">Valor</th><th class="num">Líquido</th><th>Pago em</th><th></th></tr></thead>
+      <tbody id="tb-cob"></tbody>
+    </table></div>
+  </section>
+
+  <!-- ===== Despesas ===== -->
+  <section data-painel="despesas" class="escondido">
+    <div class="barra"><h2>Despesas</h2><input type="month" id="mes-desp" aria-label="Mês"><button class="btn btn-sec btn-peq" id="desp-todas">Ver todas</button><button class="btn btn-principal btn-peq" id="nova-desp">+ Nova despesa</button></div>
+    <div class="tabela-wrap"><table>
+      <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th class="num">Valor</th><th></th></tr></thead>
+      <tbody id="tb-desp"></tbody>
+      <tfoot><tr><td colspan="4" style="text-align:right;font-weight:600">Total</td><td class="num" id="desp-total" style="font-weight:600"></td><td></td></tr></tfoot>
+    </table></div>
+  </section>
+
+  <!-- ===== Configurações ===== -->
+  <section data-painel="config" class="escondido">
+    <div class="barra"><h2>Preços padrão dos planos</h2></div>
+    <p class="muted" style="margin-bottom:14px">Valores "a partir de" que aparecem no site e já vêm preenchidos ao criar contrato. Cada contrato pode ter o seu próprio valor.</p>
+    <div id="lista-planos" class="duas" style="margin-bottom:32px"></div>
+    <div class="barra"><h2>Últimos eventos do Asaas</h2><button class="btn btn-sec btn-peq" id="recarregar-wh">Atualizar</button></div>
+    <div class="tabela-wrap"><table>
+      <thead><tr><th>Recebido</th><th>Evento</th><th>Cobrança</th><th>Status</th><th></th></tr></thead>
+      <tbody id="tb-wh"></tbody>
+    </table></div>
+  </section>
+</main>
+
+<!-- ===== Modal: novo/editar contrato ===== -->
+<dialog id="dlg-contrato">
+  <form id="form-contrato" novalidate>
+    <div class="cab"><h2 id="fc-titulo">Novo contrato</h2><button type="button" class="fechar" data-fechar aria-label="Fechar">×</button></div>
+    <div class="corpo">
+      <div id="fc-erro" class="aviso erro escondido" role="alert"></div>
+      <h3 style="font-size:.95rem;margin-bottom:10px">Cliente</h3>
+      <div class="linha">
+        <div class="campo" data-campo="nome"><label for="fc-nome">Nome *</label><input id="fc-nome" name="nome" maxlength="120"><div class="msg-erro"></div></div>
+        <div class="campo" data-campo="cpfCnpj"><label for="fc-doc">CPF ou CNPJ *</label><input id="fc-doc" name="cpfCnpj" maxlength="18" inputmode="numeric"><div class="msg-erro"></div></div>
+      </div>
+      <div class="linha">
+        <div class="campo" data-campo="email"><label for="fc-email">E-mail * <span class="muted">(recebe as cobranças)</span></label><input id="fc-email" name="email" type="email" maxlength="160"><div class="msg-erro"></div></div>
+        <div class="campo" data-campo="telefone"><label for="fc-tel">WhatsApp</label><input id="fc-tel" name="telefone" maxlength="16" inputmode="numeric"><div class="msg-erro"></div></div>
+      </div>
+      <div class="campo" data-campo="empresa"><label for="fc-emp">Empresa / marca</label><input id="fc-emp" name="empresa" maxlength="120"></div>
+
+      <h3 style="font-size:.95rem;margin:10px 0">Projeto e valores</h3>
+      <div class="linha">
+        <div class="campo"><label for="fc-plano">Plano</label>
+          <select id="fc-plano" name="plano"><option value="GENOVA_HOSPEDA">Genova Hospeda (a gente hospeda)</option><option value="INDEPENDENTE">Independente (domínio/banco do cliente)</option></select></div>
+        <div class="campo"><label for="fc-tipo">Tipo de site</label>
+          <select id="fc-tipo" name="tipoSite">
+            <option value="INSTITUCIONAL">Site institucional</option><option value="LOJA_VIRTUAL">Loja virtual</option><option value="CARDAPIO">Cardápio / restaurante</option>
+            <option value="PORTFOLIO">Portfólio</option><option value="LANDING_PAGE">Landing page</option><option value="SISTEMA">Sistema sob medida</option>
+            <option value="AUTOMACAO">Automação</option><option value="OUTRO">Outro</option>
+          </select></div>
+      </div>
+      <div class="campo" data-campo="escopo"><label for="fc-escopo">O que está incluso * <span class="muted">(o cliente vê)</span></label>
+        <textarea id="fc-escopo" name="escopo" maxlength="3000" placeholder="Ex: Loja com até 50 produtos, carrinho, frete SuperFrete, Pix e cartão, 5 páginas, logo..."></textarea><div class="msg-erro"></div></div>
+      <div class="linha">
+        <div class="campo" data-campo="valorCriacao"><label for="fc-valor">Valor da criação (R$)</label><input id="fc-valor" name="valorCriacao" type="number" min="0" step="0.01"><div class="msg-erro"></div></div>
+        <div class="campo"><label for="fc-parc">Parcelas no cartão (máx.)</label>
+          <select id="fc-parc" name="parcelasMaxCartao"></select></div>
+      </div>
+      <div class="linha" id="fc-linha-mensal">
+        <div class="campo" data-campo="valorMensal"><label for="fc-mensal">Mensalidade (R$)</label><input id="fc-mensal" name="valorMensal" type="number" min="0" step="0.01"><div class="msg-erro"></div></div>
+        <div class="campo"><label for="fc-inicio">1º vencimento da mensalidade</label><input id="fc-inicio" name="inicioMensalidade" type="date">
+          <div class="muted" style="margin-top:4px">Vazio = 30 dias depois que você marcar o site como entregue.</div></div>
+      </div>
+      <div class="campo"><label for="fc-notas">Anotações internas <span class="muted">(só você vê)</span></label><textarea id="fc-notas" name="observacoesInternas" maxlength="2000" style="min-height:70px"></textarea></div>
+      <input type="hidden" id="fc-pedido" name="pedidoId">
+    </div>
+    <div class="rodape">
+      <button type="button" class="btn btn-sec" data-fechar>Cancelar</button>
+      <button class="btn btn-principal" id="fc-salvar">Criar contrato</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ===== Modal: detalhe do contrato ===== -->
+<dialog id="dlg-detalhe">
+  <div class="cab"><h2 id="dt-titulo">Contrato</h2><button class="fechar" data-fechar aria-label="Fechar">×</button></div>
+  <div class="corpo" id="dt-corpo"></div>
+  <div class="rodape" id="dt-rodape"></div>
+</dialog>
+
+<!-- ===== Modal: despesa ===== -->
+<dialog id="dlg-desp" style="width:min(480px,calc(100% - 24px))">
+  <form id="form-desp" novalidate>
+    <div class="cab"><h2 id="fd-titulo">Nova despesa</h2><button type="button" class="fechar" data-fechar aria-label="Fechar">×</button></div>
+    <div class="corpo">
+      <div id="fd-erro" class="aviso erro escondido" role="alert"></div>
+      <div class="campo"><label for="fd-desc">Descrição</label><input id="fd-desc" maxlength="150" placeholder="Ex: Railway, domínio, Canva..."></div>
+      <div class="linha">
+        <div class="campo"><label for="fd-cat">Categoria</label><select id="fd-cat">
+          <option value="HOSPEDAGEM">Hospedagem</option><option value="DOMINIO">Domínio</option><option value="FERRAMENTAS">Ferramentas</option>
+          <option value="MARKETING">Marketing</option><option value="IMPOSTOS">Impostos</option><option value="EQUIPAMENTO">Equipamento</option><option value="OUTROS">Outros</option></select></div>
+        <div class="campo"><label for="fd-valor">Valor (R$)</label><input id="fd-valor" type="number" min="0.01" step="0.01"></div>
+      </div>
+      <div class="linha">
+        <div class="campo"><label for="fd-data">Data</label><input id="fd-data" type="date"></div>
+        <div class="campo"><label for="fd-fim">Termina em <span class="muted">(se recorrente)</span></label><input id="fd-fim" type="date"></div>
+      </div>
+      <label style="display:flex;gap:8px;align-items:center;color:var(--texto)"><input type="checkbox" id="fd-rec" style="width:auto"> Repete todo mês</label>
+    </div>
+    <div class="rodape"><button type="button" class="btn btn-sec" data-fechar>Cancelar</button><button class="btn btn-principal">Salvar</button></div>
+  </form>
+</dialog>
+
+<div id="toast" class="aviso escondido" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="comum.js"></script>
+<script>
+(() => {
+  const API = window.GENOVA_API;
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+  const { brl, data, dataHora, esc } = G;
+  const NOMES = { NOVO: 'Novo', EM_CONTATO: 'Em contato', CONVERTIDO: 'Virou contrato', DESCARTADO: 'Descartado',
+    AGUARDANDO_ACEITE: 'Aguardando aceite', AGUARDANDO_PAGAMENTO: 'Aguardando pagamento', ATIVO: 'Ativo', ATRASADO: 'Atrasado', CANCELADO: 'Cancelado',
+    PENDENTE: 'Pendente', PAGA: 'Paga', VENCIDA: 'Vencida', REMOVIDA: 'Removida', ESTORNADA: 'Estornada',
+    ABERTO: 'Aberto', EM_ANDAMENTO: 'Em andamento', RESOLVIDO: 'Resolvido', FECHADO: 'Fechado',
+    CRIACAO: 'Criação', MENSALIDADE: 'Mensalidade', BAIXA: 'Baixa', NORMAL: 'Normal', URGENTE: 'Urgente',
+    GARANTIA: 'Suporte pós-entrega', MANUTENCAO: 'Manutenção do plano',
+    HOSPEDAGEM: 'Hospedagem', DOMINIO: 'Domínio', FERRAMENTAS: 'Ferramentas', MARKETING: 'Marketing', IMPOSTOS: 'Impostos', EQUIPAMENTO: 'Equipamento', OUTROS: 'Outros' };
+  const TIPOS = { INSTITUCIONAL: 'Site institucional', LOJA_VIRTUAL: 'Loja virtual', CARDAPIO: 'Cardápio', PORTFOLIO: 'Portfólio',
+    LANDING_PAGE: 'Landing page', SISTEMA: 'Sistema', AUTOMACAO: 'Automação', OUTRO: 'Outro' };
+  const selo = s => `<span class="selo s-${s}">${NOMES[s] || s}</span>`;
+  const hoje = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const mesAtual = hoje().slice(0, 7);
+  const nomeMes = m => new Date(m + '-15T12:00:00').toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('. de ', '/').replace(' de ', '/');
+  const urlPortal = n => new URL('contrato.html?n=' + encodeURIComponent(n), location.href).href;
+
+  let auth = null;
+  try { auth = sessionStorage.getItem('genova-auth'); } catch (e) {}
+
+  function toast(msg, tipo = 'ok') {
+    const t = $('#toast'); t.className = 'aviso ' + tipo; t.textContent = msg;
+    clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add('escondido'), 4000);
+  }
+
+  async function api(caminho, opcoes = {}) {
+    const r = await fetch(API + caminho, { ...opcoes,
+      headers: { 'Authorization': 'Basic ' + auth, ...(opcoes.body ? { 'Content-Type': 'application/json' } : {}) } });
+    if (r.status === 401) { sair(); throw new Error('Sessão expirada. Entre de novo.'); }
+    if (!r.ok) { const c = await r.json().catch(() => ({})); const e = new Error(c.mensagem || `Erro ${r.status}`); e.campos = c.campos; throw e; }
+    if (r.status === 204) return null;
+    return (r.headers.get('content-type') || '').includes('json') ? r.json() : r;
+  }
+  const enviar = (caminho, metodo, corpo) => api(caminho, { method: metodo, body: corpo === undefined ? undefined : JSON.stringify(corpo) });
+
+  document.addEventListener('click', e => { const f = e.target.closest('[data-fechar]'); if (f) f.closest('dialog').close(); });
+
+  // ---------- login ----------
+  $('#form-login').addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = $('#login-erro'); err.classList.add('escondido');
+    auth = btoa(unescape(encodeURIComponent($('#l-user').value + ':' + $('#l-pass').value)));
+    try {
+      const me = await api('/api/admin/me');
+      try { sessionStorage.setItem('genova-auth', auth); } catch (e) {}
+      entrar(me.usuario);
+    } catch (ex) {
+      auth = null;
+      err.textContent = ex.message === 'Failed to fetch' ? 'API fora do ar ou endereço errado (config.js).' : 'Usuário ou senha incorretos.';
+      err.classList.remove('escondido');
+    }
+  });
+  function entrar(nome) {
+    $('#login').classList.add('escondido'); $('#app').classList.remove('escondido');
+    $('#usuario').classList.remove('escondido'); $('#usuario-nome').textContent = nome;
+    abrir('dashboard');
+  }
+  function sair() {
+    auth = null; try { sessionStorage.removeItem('genova-auth'); } catch (e) {}
+    $('#app').classList.add('escondido'); $('#usuario').classList.add('escondido'); $('#login').classList.remove('escondido');
+  }
+  $('#sair').onclick = sair;
+
+  // ---------- abas ----------
+  const carregar = {};
+  function abrir(aba) {
+    $$('.aba').forEach(b => b.setAttribute('aria-selected', b.dataset.aba === aba));
+    $$('[data-painel]').forEach(p => p.classList.toggle('escondido', p.dataset.painel !== aba));
+    carregar[aba]?.().catch(e => toast(e.message, 'erro'));
+  }
+  $$('.aba').forEach(b => b.onclick = () => abrir(b.dataset.aba));
+  function contador(id, n) { const c = $(id); c.textContent = n; c.classList.toggle('escondido', !n); }
+
+  // ================= DASHBOARD =================
+  $('#mes-dash').value = mesAtual;
+  $('#mes-dash').onchange = () => abrir('dashboard');
+  let ultimoHist = [];
+  carregar.dashboard = async () => {
+    const d = await api('/api/admin/dashboard?mes=' + $('#mes-dash').value);
+    contador('#cont-orc', d.pedidosNovos); contador('#cont-ch', d.chamadosAbertos);
+    const a = d.atual, lucroPos = Number(a.lucro) >= 0;
+    $('#kpis').innerHTML = `
+      <div class="kpi destaque"><small>Receita recorrente (mensal)</small><strong>${brl(d.receitaRecorrente)}</strong><div class="det">${d.contratosAtivos + d.contratosAtrasados} cliente(s) com mensalidade/ativos</div></div>
+      <div class="kpi"><small>Faturado no mês</small><strong>${brl(a.recebidoBruto)}</strong><div class="det">Líquido: ${brl(a.recebidoLiquido)}</div></div>
+      <div class="kpi"><small>Despesas do mês</small><strong>${brl(a.despesas)}</strong><div class="det">Criação ${brl(a.criacao)} · Mensal. ${brl(a.mensalidades)}</div></div>
+      <div class="kpi ${lucroPos ? 'bom' : 'alerta'}"><small>Lucro do mês</small><strong>${brl(a.lucro)}</strong><div class="det">líquido − despesas</div></div>
+      <div class="kpi"><small>A receber no mês</small><strong>${brl(d.aReceberNoMes)}</strong><div class="det">cobranças pendentes</div></div>
+      <div class="kpi ${Number(d.emAtraso) > 0 ? 'alerta' : ''}"><small>Em atraso</small><strong>${brl(d.emAtraso)}</strong><div class="det">${d.cobrancasVencidas} cobrança(s) · ${d.contratosAtrasados} cliente(s)</div></div>
+      <div class="kpi"><small>Contratos</small><strong>${d.contratosAtivos}</strong><div class="det">ativos · ${d.aguardandoAceite} aguardando aceite · ${d.aguardandoPagamento} aguardando pgto</div></div>
+      <div class="kpi"><small>Atendimento</small><strong>${d.chamadosAbertos}</strong><div class="det">chamado(s) aberto(s) · ${d.pedidosNovos} orçamento(s) novo(s)</div></div>`;
+    ultimoHist = d.historico;
+    grafico(d.historico);
+    $('#top-clientes').innerHTML = d.topClientes.length ? `<div class="tabela-wrap"><table><thead><tr><th>Cliente</th><th class="num">Total pago</th><th class="num">Mensal</th></tr></thead><tbody>${
+      d.topClientes.map(t => `<tr><td><strong>${esc(t.cliente)}</strong><div class="muted">${esc(t.contrato)} · ${NOMES[t.status] || t.status}</div></td><td class="num">${brl(t.totalPago)}</td><td class="num">${Number(t.mensalidade) > 0 ? brl(t.mensalidade) : '—'}</td></tr>`).join('')
+    }</tbody></table></div>` : '<p class="muted">Ainda sem pagamentos.</p>';
+    const cats = Object.entries(d.despesasPorCategoria);
+    const totCat = cats.reduce((s, [, v]) => s + Number(v), 0);
+    $('#desp-cat').innerHTML = cats.length ? cats.sort((x, y) => y[1] - x[1]).map(([k, v]) => `
+      <div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.88rem"><span>${NOMES[k] || k}</span><span style="font-variant-numeric:tabular-nums">${brl(v)}</span></div>
+      <div style="height:6px;background:rgba(255,255,255,.06);border-radius:4px;margin-top:4px"><div style="height:6px;border-radius:4px;background:var(--serie-despesa);width:${(Number(v) / totCat * 100).toFixed(1)}%"></div></div></div>`).join('')
+      : '<p class="muted">Nenhuma despesa lançada neste mês.</p>';
+  };
+
+  function grafico(hist) {
+    const W = 760, H = 260, m = { t: 12, r: 8, b: 26, l: 56 };
+    const max = Math.max(1, ...hist.flatMap(h => [Number(h.recebidoLiquido), Number(h.despesas)]));
+    const passo = Math.pow(10, Math.floor(Math.log10(max)));
+    const topo = Math.ceil(max / passo) * passo;
+    const y = v => m.t + (H - m.t - m.b) * (1 - v / topo);
+    const largG = (W - m.l - m.r) / hist.length;
+    const barra = Math.min(18, (largG - 10) / 2);
+    const linhas = [0, .25, .5, .75, 1].map(f => topo * f);
+    const fmtEixo = v => v >= 1000 ? 'R$ ' + (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'k' : 'R$ ' + v.toLocaleString('pt-BR');
+    const rect = (x, v, cor) => {
+      const h = Math.max(0, y(0) - y(v)); if (h <= 0) return '';
+      const r = Math.min(4, h, barra / 2);
+      // topo arredondado, base reta na linha zero
+      return `<path fill="${cor}" d="M${x},${y(0)} V${y(0) - h + r} Q${x},${y(0) - h} ${x + r},${y(0) - h} H${x + barra - r} Q${x + barra},${y(0) - h} ${x + barra},${y(0) - h + r} V${y(0)} Z"/>`;
+    };
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Entradas líquidas e despesas por mês">`;
+    linhas.forEach(v => svg += `<line class="grade-linha" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text class="eixo" x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${fmtEixo(v)}</text>`);
+    hist.forEach((h, i) => {
+      const x0 = m.l + i * largG, cx = x0 + largG / 2;
+      svg += `<rect class="alvo" data-i="${i}" x="${x0}" y="${m.t}" width="${largG}" height="${H - m.t - m.b}" rx="6"/>`;
+      svg += rect(cx - barra - 1, Number(h.recebidoLiquido), 'var(--serie-entrada)');
+      svg += rect(cx + 1, Number(h.despesas), 'var(--serie-despesa)');
+      svg += `<text class="eixo" x="${cx}" y="${H - 8}" text-anchor="middle">${nomeMes(h.mes)}</text>`;
+    });
+    svg += '</svg>';
+    $('#grafico').innerHTML = svg;
+    const tip = $('#tip'), card = $('#grafico').closest('.graf-card');
+    $$('#grafico .alvo').forEach(a => {
+      a.addEventListener('mousemove', ev => {
+        const h = hist[a.dataset.i];
+        $$('#grafico .alvo').forEach(o => o.classList.toggle('ativo', o === a));
+        tip.innerHTML = `<div style="font-weight:600;margin-bottom:6px">${nomeMes(h.mes)}</div>
+          <div class="l"><span><i style="background:var(--serie-entrada)"></i>Entradas</span><span>${brl(h.recebidoLiquido)}</span></div>
+          <div class="l"><span><i style="background:var(--serie-despesa)"></i>Despesas</span><span>${brl(h.despesas)}</span></div>
+          <div class="l" style="margin-top:6px;border-top:1px solid var(--borda);padding-top:6px"><span>Lucro</span><strong>${brl(h.lucro)}</strong></div>
+          <div class="l muted"><span>Bruto</span><span>${brl(h.recebidoBruto)}</span></div>`;
+        tip.classList.remove('escondido');
+        const r = card.getBoundingClientRect();
+        let x = ev.clientX - r.left + 14; if (x + 190 > r.width) x = ev.clientX - r.left - 200;
+        tip.style.left = x + 'px'; tip.style.top = (ev.clientY - r.top - 20) + 'px';
+      });
+      a.addEventListener('mouseleave', () => { tip.classList.add('escondido'); a.classList.remove('ativo'); });
+    });
+    $('#tabela-graf').innerHTML = `<table><thead><tr><th>Mês</th><th class="num">Bruto</th><th class="num">Entradas (líq.)</th><th class="num">Criação</th><th class="num">Mensalidades</th><th class="num">Despesas</th><th class="num">Lucro</th></tr></thead><tbody>${
+      hist.map(h => `<tr><td>${nomeMes(h.mes)}</td><td class="num">${brl(h.recebidoBruto)}</td><td class="num">${brl(h.recebidoLiquido)}</td><td class="num">${brl(h.criacao)}</td><td class="num">${brl(h.mensalidades)}</td><td class="num">${brl(h.despesas)}</td><td class="num">${brl(h.lucro)}</td></tr>`).join('')}</tbody></table>`;
+  }
+  $('#ver-tabela').onclick = () => {
+    const t = $('#tabela-graf'), escondida = t.classList.toggle('escondido');
+    $('#ver-tabela').textContent = escondida ? 'Ver tabela' : 'Esconder tabela';
+  };
+  $('#baixar-csv').onclick = async () => {
+    try {
+      const mes = $('#mes-dash').value, r = await api('/api/admin/relatorio.csv?mes=' + mes), blob = await r.blob();
+      const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `genova-cobrancas-${mes}.csv` });
+      a.click(); URL.revokeObjectURL(a.href);
+    } catch (e) { toast(e.message, 'erro'); }
+  };
+
+  // ================= ORÇAMENTOS =================
+  $('#filtro-orc').onchange = () => abrir('orcamentos');
+  let orcCache = [];
+  carregar.orcamentos = async () => {
+    const st = $('#filtro-orc').value;
+    orcCache = await api('/api/admin/pedidos' + (st ? '?status=' + st : ''));
+    if (st === 'NOVO') contador('#cont-orc', orcCache.length);
+    $('#lista-orc').innerHTML = orcCache.length ? orcCache.map(p => `
+      <article class="card item">
+        <div class="item-cab">
+          <div><h3>${esc(p.nome)} ${p.empresa ? `<span class="muted">· ${esc(p.empresa)}</span>` : ''}</h3>
+            <div class="muted">${esc(p.tipoSiteDescricao)} · ${p.planoInteresse === 'GENOVA_HOSPEDA' ? 'quer Genova Hospeda' : p.planoInteresse === 'INDEPENDENTE' ? 'quer Independente' : 'plano a definir'} · ${dataHora(p.criadoEm)}</div>
+            <div class="muted">${esc(p.telefone)}${p.email ? ' · ' + esc(p.email) : ''}${p.prazo ? ' · prazo: ' + esc(p.prazo) : ''}${p.referencias ? ' · ref: ' + esc(p.referencias) : ''}</div></div>
+          ${selo(p.status)}
+        </div>
+        <div class="obs">${esc(p.descricao)}</div>
+        ${p.notasInternas ? `<div class="muted" style="margin-top:8px">📝 ${esc(p.notasInternas)}</div>` : ''}
+        <div class="acoes" style="margin-top:12px">
+          <a class="btn btn-whats btn-peq" target="_blank" rel="noopener" href="${G.linkWhats(`Oi ${p.nome.split(' ')[0]}, tudo bem? Aqui é da Genova Forge, recebi sua ficha de orçamento!`, '55' + G.so(p.telefone))}">WhatsApp do cliente</a>
+          ${p.status !== 'CONVERTIDO' ? `<button class="btn btn-principal btn-peq" data-converter="${p.id}">Criar contrato</button>` : `<button class="btn btn-sec btn-peq" data-ver-ct="${p.contratoId}">Ver contrato</button>`}
+          ${p.status === 'NOVO' ? `<button class="btn btn-sec btn-peq" data-st="${p.id}:EM_CONTATO">Marcar em contato</button>` : ''}
+          ${p.status !== 'DESCARTADO' && p.status !== 'CONVERTIDO' ? `<button class="btn btn-perigo btn-peq" data-st="${p.id}:DESCARTADO">Descartar</button>` : ''}
+          <button class="btn btn-sec btn-peq" data-nota="${p.id}">Anotar</button>
+        </div>
+      </article>`).join('') : '<div class="card vazio">Nada por aqui.</div>';
+    $$('[data-converter]').forEach(b => b.onclick = () => abrirFormContrato(null, orcCache.find(p => p.id == b.dataset.converter)));
+    $$('[data-ver-ct]').forEach(b => b.onclick = () => detalhe(b.dataset.verCt));
+    $$('[data-st]').forEach(b => b.onclick = async () => {
+      const [id, status] = b.dataset.st.split(':');
+      try { await enviar('/api/admin/pedidos/' + id, 'PUT', { status }); abrir('orcamentos'); } catch (e) { toast(e.message, 'erro'); }
+    });
+    $$('[data-nota]').forEach(b => b.onclick = async () => {
+      const p = orcCache.find(x => x.id == b.dataset.nota);
+      const n = prompt('Anotação interna:', p.notasInternas || ''); if (n === null) return;
+      try { await enviar('/api/admin/pedidos/' + p.id, 'PUT', { notasInternas: n }); abrir('orcamentos'); } catch (e) { toast(e.message, 'erro'); }
+    });
+  };
+
+  // ================= CONTRATOS =================
+  $('#filtro-ct').onchange = () => abrir('contratos');
+  carregar.contratos = async () => {
+    const st = $('#filtro-ct').value;
+    const lista = await api('/api/admin/contratos' + (st ? '?status=' + st : ''));
+    $('#tb-contratos').innerHTML = lista.length ? lista.map(c => `
+      <tr class="clicavel" data-id="${c.id}">
+        <td><strong>${esc(c.numero)}</strong></td>
+        <td>${esc(c.cliente.nome)}<div class="muted">${esc(c.cliente.empresa || c.tipoSiteDescricao)}</div></td>
+        <td>${esc(c.planoNome)}</td><td>${selo(c.status)}</td>
+        <td class="num">${brl(c.valorCriacao)}</td>
+        <td class="num">${Number(c.valorMensal) > 0 ? brl(c.valorMensal) : '—'}</td>
+        <td>${c.dataEntrega ? data(c.dataEntrega) : '<span class="muted">—</span>'}</td>
+      </tr>`).join('') : '<tr><td colspan="7" class="vazio">Nenhum contrato ainda. Crie o primeiro em "+ Novo contrato".</td></tr>';
+    $$('#tb-contratos tr[data-id]').forEach(tr => tr.onclick = () => detalhe(tr.dataset.id));
+  };
+  $('#novo-contrato').onclick = () => abrirFormContrato(null, null);
+
+  // --- formulário de contrato ---
+  let planos = [];
+  const fc = $('#form-contrato');
+  $('#fc-parc').innerHTML = Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1 === 1 ? 'Só à vista' : 'Até ' + (i + 1) + 'x'}</option>`).join('');
+  G.mascaraDoc($('#fc-doc')); G.mascaraTel($('#fc-tel'));
+  $('#fc-plano').onchange = () => {
+    const p = planos.find(x => x.codigo === $('#fc-plano').value);
+    if (p && !fc.dataset.editando) { $('#fc-mensal').value = p.valorMensal; if (!$('#fc-valor').value) $('#fc-valor').value = p.valorCriacaoBase; }
+    $('#fc-linha-mensal').style.display = $('#fc-plano').value === 'INDEPENDENTE' && Number($('#fc-mensal').value) === 0 ? 'none' : '';
+  };
+  async function abrirFormContrato(contrato, pedido) {
+    if (!planos.length) planos = await api('/api/admin/planos').catch(() => []);
+    fc.reset(); fc.querySelectorAll('.invalido').forEach(c => c.classList.remove('invalido')); $('#fc-erro').classList.add('escondido');
+    delete fc.dataset.editando; $('#fc-pedido').value = '';
+    $('#fc-titulo').textContent = contrato ? 'Editar ' + contrato.numero : 'Novo contrato';
+    $('#fc-salvar').textContent = contrato ? 'Salvar alterações' : 'Criar contrato';
+    if (contrato) {
+      fc.dataset.editando = contrato.id;
+      const c = contrato;
+      Object.entries({ 'fc-nome': c.cliente.nome, 'fc-doc': c.cliente.cpfCnpj, 'fc-email': c.cliente.email, 'fc-tel': c.cliente.telefone || '',
+        'fc-emp': c.cliente.empresa || '', 'fc-plano': c.plano, 'fc-tipo': c.tipoSite, 'fc-escopo': c.escopo, 'fc-valor': c.valorCriacao,
+        'fc-parc': c.parcelasMaxCartao, 'fc-mensal': c.valorMensal, 'fc-inicio': c.inicioMensalidade || '', 'fc-notas': c.observacoesInternas || '' })
+        .forEach(([id, v]) => $('#' + id).value = v);
+      $('#fc-doc').dispatchEvent(new Event('input'));
+    } else {
+      if (pedido) {
+        $('#fc-nome').value = pedido.nome; $('#fc-email').value = pedido.email || ''; $('#fc-tel').value = pedido.telefone;
+        $('#fc-emp').value = pedido.empresa || ''; $('#fc-tipo').value = pedido.tipoSite; $('#fc-escopo').value = pedido.descricao;
+        if (pedido.planoInteresse) $('#fc-plano').value = pedido.planoInteresse;
+        $('#fc-pedido').value = pedido.id;
+      }
+      $('#fc-valor').value = '';
+      $('#fc-plano').dispatchEvent(new Event('change'));
+    }
+    $('#fc-plano').dispatchEvent(new Event('change'));
+    $('#dlg-contrato').showModal();
+  }
+  fc.addEventListener('submit', async e => {
+    e.preventDefault();
+    fc.querySelectorAll('.invalido').forEach(c => c.classList.remove('invalido'));
+    const err = $('#fc-erro'); err.classList.add('escondido');
+    const v = id => $('#' + id).value.trim();
+    const corpo = { nome: v('fc-nome'), cpfCnpj: v('fc-doc'), email: v('fc-email'), telefone: v('fc-tel'), empresa: v('fc-emp'),
+      plano: v('fc-plano'), tipoSite: v('fc-tipo'), escopo: v('fc-escopo'), valorCriacao: Number(v('fc-valor') || 0),
+      parcelasMaxCartao: Number(v('fc-parc')), valorMensal: Number(v('fc-mensal') || 0), inicioMensalidade: v('fc-inicio') || null,
+      pedidoId: v('fc-pedido') ? Number(v('fc-pedido')) : null, observacoesInternas: v('fc-notas') };
+    if (!G.docValido(corpo.cpfCnpj)) { marcarCampo('cpfCnpj', 'CPF ou CNPJ inválido'); return; }
+    const btn = $('#fc-salvar'); btn.disabled = true;
+    try {
+      const id = fc.dataset.editando;
+      const c = await enviar(id ? '/api/admin/contratos/' + id : '/api/admin/contratos', id ? 'PUT' : 'POST', corpo);
+      $('#dlg-contrato').close();
+      toast(id ? 'Contrato atualizado.' : `Contrato ${c.numero} criado!`);
+      abrir('contratos');
+      detalhe(c.id, c);
+    } catch (ex) {
+      if (ex.campos) Object.entries(ex.campos).forEach(([k, m]) => marcarCampo(k, m));
+      err.textContent = ex.message; err.classList.remove('escondido');
+    } finally { btn.disabled = false; }
+  });
+  function marcarCampo(campo, msg) {
+    const c = fc.querySelector(`[data-campo="${campo}"]`); if (!c) return;
+    c.classList.add('invalido'); c.querySelector('.msg-erro').textContent = msg;
+  }
+
+  // --- detalhe do contrato ---
+  function msgCliente(c) {
+    return `Oi ${c.cliente.nome.split(' ')[0]}! Aqui é da Genova Forge 💜\n\nSeu contrato está pronto: *${c.numero}*\n\n` +
+      `Acesse ${urlPortal(c.numero)} e entre com o número do contrato + seu CPF/CNPJ. Lá você confere o que está incluso, ` +
+      `os valores, e paga no Pix, boleto ou cartão${c.parcelasMaxCartao > 1 ? ` (até ${c.parcelasMaxCartao}x)` : ''}.`;
+  }
+  async function detalhe(id, preCarregado) {
+    let c = preCarregado && preCarregado.cobrancas ? preCarregado : null;
+    try { if (!c) c = await api('/api/admin/contratos/' + id); } catch (e) { toast(e.message, 'erro'); return; }
+    const temMensal = Number(c.valorMensal) > 0;
+    $('#dt-titulo').innerHTML = `${esc(c.numero)} ${selo(c.status)}`;
+    $('#dt-corpo').innerHTML = `
+      <dl class="info-grid">
+        <dt>Cliente</dt><dd><strong>${esc(c.cliente.nome)}</strong>${c.cliente.empresa ? ' · ' + esc(c.cliente.empresa) : ''}</dd>
+        <dt>Contato</dt><dd>${esc(c.cliente.email)}${c.cliente.telefone ? ' · ' + esc(c.cliente.telefone) : ''}</dd>
+        <dt>CPF/CNPJ</dt><dd>${esc(c.cliente.cpfCnpj)}</dd>
+        <dt>Plano</dt><dd>${esc(c.planoNome)} · ${esc(c.tipoSiteDescricao)}</dd>
+        <dt>Criação</dt><dd>${brl(c.valorCriacao)}${c.parcelasMaxCartao > 1 ? ` (até ${c.parcelasMaxCartao}x no cartão)` : ''}</dd>
+        <dt>Mensalidade</dt><dd>${temMensal ? brl(c.valorMensal) + ' · ' + (c.asaasSubscriptionId ? 'cobrando desde ' + data(c.inicioMensalidade) : c.inicioMensalidade ? 'começa ' + data(c.inicioMensalidade) : 'começa 30 dias após a entrega') : 'Sem mensalidade'}</dd>
+        <dt>Pagamento</dt><dd>${c.formaPagamento ? NOMES[c.formaPagamento] || ({ PIX: 'Pix', BOLETO: 'Boleto', CREDIT_CARD: 'Cartão', UNDEFINED: 'Na fatura' })[c.formaPagamento] : '—'}${c.aceiteEm ? ' · aceito em ' + dataHora(c.aceiteEm) : ''}</dd>
+        <dt>Entrega</dt><dd>${c.dataEntrega ? data(c.dataEntrega) + ' · suporte até ' + data(c.garantiaAte) : 'Ainda não entregue'}</dd>
+        ${c.motivoCancelamento ? `<dt>Cancelamento</dt><dd>${esc(c.motivoCancelamento)}</dd>` : ''}
+      </dl>
+      ${c.status === 'AGUARDANDO_ACEITE' ? `<div class="caixa-acao"><div class="muted">Mande pro cliente:</div><div class="numero-grande">${esc(c.numero)}</div>
+        <div class="acoes" style="margin-top:8px">
+          <button class="btn btn-sec btn-peq" id="dt-copiar">Copiar mensagem</button>
+          ${c.cliente.telefone ? `<a class="btn btn-whats btn-peq" target="_blank" rel="noopener" href="${G.linkWhats(msgCliente(c), '55' + G.so(c.cliente.telefone))}">Enviar no WhatsApp do cliente</a>` : ''}
+        </div></div>` : ''}
+      <div class="secao"><h3>O que está incluso</h3><div class="obs" style="white-space:pre-wrap;background:rgba(255,255,255,.03);padding:12px;border-radius:10px;font-size:.9rem">${esc(c.escopo)}</div></div>
+      <div class="secao"><h3>Cobranças</h3><div class="tabela-wrap"><table>
+        <thead><tr><th>Venc.</th><th>Tipo</th><th>Status</th><th class="num">Valor</th><th></th></tr></thead>
+        <tbody>${c.cobrancas.length ? c.cobrancas.map(x => `<tr><td>${data(x.vencimento)}</td><td>${NOMES[x.tipo]}${x.parcela ? ' ' + x.parcela : ''}</td><td>${selo(x.status)}</td><td class="num">${brl(x.valor)}</td><td>${x.linkFatura ? `<a href="${esc(x.linkFatura)}" target="_blank" rel="noopener">fatura</a>` : ''}</td></tr>`).join('') : '<tr><td colspan="5" class="vazio">Sem cobranças ainda.</td></tr>'}</tbody>
+      </table></div></div>
+      ${c.historicoMensalidade.length ? `<div class="secao"><h3>Histórico da mensalidade</h3>${c.historicoMensalidade.map(h => `<div class="muted" style="margin-bottom:4px">${dataHora(h.criadoEm)} · ${brl(h.valorAnterior)} → <strong style="color:var(--texto)">${brl(h.valorNovo)}</strong>${h.motivo ? ' · ' + esc(h.motivo) : ''}</div>`).join('')}</div>` : ''}
+      ${c.chamados.length ? `<div class="secao"><h3>Chamados</h3>${c.chamados.map(ch => `<div class="muted" style="margin-bottom:4px">${data(ch.criadoEm)} · ${esc(ch.titulo)} ${selo(ch.status)}</div>`).join('')}</div>` : ''}
+      <div class="secao"><h3>Anotações internas</h3><textarea id="dt-notas" maxlength="2000" style="min-height:70px">${esc(c.observacoesInternas || '')}</textarea>
+        <button class="btn btn-sec btn-peq" id="dt-salvar-notas" style="margin-top:6px">Salvar anotações</button></div>
+      <div id="dt-acao"></div>`;
+
+    const ativo = c.status !== 'CANCELADO';
+    $('#dt-rodape').innerHTML = [
+      c.status === 'AGUARDANDO_ACEITE' ? '<button class="btn btn-sec" id="dt-editar">Editar contrato</button>' : '',
+      ativo && c.status !== 'AGUARDANDO_ACEITE' ? '<button class="btn btn-sec" id="dt-mensal">Alterar mensalidade</button>' : '',
+      ativo && c.status !== 'AGUARDANDO_ACEITE' && !c.dataEntrega ? '<button class="btn btn-principal" id="dt-entregue">Marcar site como entregue</button>' : '',
+      ativo ? '<button class="btn btn-perigo" id="dt-cancelar">Cancelar contrato</button>' : ''
+    ].join('');
+
+    const recarregar = async novo => { await detalhe(c.id, novo); abrir('contratos'); };
+    $('#dt-copiar') && ($('#dt-copiar').onclick = async () => {
+      try { await navigator.clipboard.writeText(msgCliente(c)); toast('Mensagem copiada!'); } catch (e) { prompt('Copie a mensagem:', msgCliente(c)); }
+    });
+    $('#dt-salvar-notas').onclick = async () => {
+      try { await enviar(`/api/admin/contratos/${c.id}/notas`, 'PUT', { observacoesInternas: $('#dt-notas').value }); toast('Anotações salvas.'); } catch (e) { toast(e.message, 'erro'); }
+    };
+    $('#dt-editar') && ($('#dt-editar').onclick = () => { $('#dlg-detalhe').close(); abrirFormContrato(c); });
+    $('#dt-mensal') && ($('#dt-mensal').onclick = () => {
+      $('#dt-acao').innerHTML = `<div class="caixa-acao"><h3 style="font-size:.95rem;margin-bottom:10px">Alterar mensalidade</h3>
+        <div class="linha"><div class="campo"><label for="am-valor">Novo valor (R$)</label><input id="am-valor" type="number" min="0" step="0.01" value="${c.valorMensal}"></div>
+        <div class="campo"><label for="am-motivo">Motivo</label><input id="am-motivo" maxlength="500" placeholder="Ex: incluiu blog, desconto fidelidade"></div></div>
+        ${c.asaasSubscriptionId ? '<label style="display:flex;gap:8px;align-items:center;color:var(--texto);margin-bottom:10px"><input type="checkbox" id="am-pend" style="width:auto" checked> Aplicar também na cobrança já gerada e não paga</label>' : ''}
+        <button class="btn btn-principal btn-peq" id="am-salvar">Salvar novo valor</button></div>`;
+      $('#am-valor').focus();
+      $('#am-salvar').onclick = async () => {
+        try {
+          const novo = await enviar(`/api/admin/contratos/${c.id}/mensalidade`, 'POST', { valor: Number($('#am-valor').value), motivo: $('#am-motivo').value, aplicarPendentes: !!$('#am-pend')?.checked });
+          toast('Mensalidade atualizada' + (c.asaasSubscriptionId ? ' (também no Asaas).' : '.')); recarregar(novo);
+        } catch (e) { toast(e.message, 'erro'); }
+      };
+    });
+    $('#dt-entregue') && ($('#dt-entregue').onclick = () => {
+      $('#dt-acao').innerHTML = `<div class="caixa-acao"><h3 style="font-size:.95rem;margin-bottom:10px">Site entregue</h3>
+        <div class="campo"><label for="en-data">Data da entrega</label><input id="en-data" type="date" value="${hoje()}"></div>
+        <p class="muted" style="margin-bottom:10px">Começam os 30 dias de suporte.${temMensal && !c.asaasSubscriptionId ? ' A mensalidade é criada no Asaas' + (c.inicioMensalidade ? ' com início em ' + data(c.inicioMensalidade) : ' com 1º vencimento 30 dias após a entrega') + '.' : ''}</p>
+        <button class="btn btn-principal btn-peq" id="en-salvar">Confirmar entrega</button></div>`;
+      $('#en-salvar').onclick = async () => {
+        try { const novo = await enviar(`/api/admin/contratos/${c.id}/entregue`, 'POST', { data: $('#en-data').value || null }); toast('Entrega registrada!'); recarregar(novo); }
+        catch (e) { toast(e.message, 'erro'); }
+      };
+    });
+    $('#dt-cancelar') && ($('#dt-cancelar').onclick = async () => {
+      const motivo = prompt(`Cancelar ${c.numero}?${c.asaasSubscriptionId ? '\nAs mensalidades futuras param no Asaas.' : ''}\n\nMotivo (opcional):`);
+      if (motivo === null) return;
+      try { const novo = await enviar(`/api/admin/contratos/${c.id}/cancelar`, 'POST', { motivo }); toast('Contrato cancelado.'); recarregar(novo); }
+      catch (e) { toast(e.message, 'erro'); }
+    });
+    if (!$('#dlg-detalhe').open) $('#dlg-detalhe').showModal();
+  }
+
+  // ================= CHAMADOS =================
+  $('#filtro-ch').onchange = () => abrir('chamados');
+  carregar.chamados = async () => {
+    const abertos = $('#filtro-ch').value === 'true';
+    const lista = await api('/api/admin/chamados?abertos=' + abertos);
+    if (abertos) contador('#cont-ch', lista.length);
+    $('#lista-ch').innerHTML = lista.length ? lista.map(ch => `
+      <article class="card item">
+        <div class="item-cab">
+          <div><h3>${esc(ch.titulo)}</h3><div class="muted">${esc(ch.cliente)} · ${esc(ch.contratoNumero)} · ${NOMES[ch.origem] || ch.origem} · ${dataHora(ch.criadoEm)}</div></div>
+          <div class="acoes">${ch.prioridade === 'URGENTE' ? selo('URGENTE') : ''}${selo(ch.status)}</div>
+        </div>
+        <div class="obs">${esc(ch.descricao)}</div>
+        <div class="campo" style="margin-top:12px"><label for="resp-${ch.id}">Resposta pro cliente (aparece na área do cliente)</label><textarea id="resp-${ch.id}" maxlength="3000" style="min-height:70px">${esc(ch.resposta || '')}</textarea></div>
+        <div class="acoes">
+          <select id="st-${ch.id}" style="width:auto;padding:7px 10px">${['ABERTO', 'EM_ANDAMENTO', 'RESOLVIDO', 'FECHADO'].map(s => `<option value="${s}" ${s === ch.status ? 'selected' : ''}>${NOMES[s]}</option>`).join('')}</select>
+          <button class="btn btn-principal btn-peq" data-salvar-ch="${ch.id}">Salvar</button>
+          ${ch.telefone ? `<a class="btn btn-whats btn-peq" target="_blank" rel="noopener" href="${G.linkWhats(`Oi! Aqui é da Genova Forge, sobre o seu chamado "${ch.titulo}":`, '55' + G.so(ch.telefone))}">WhatsApp do cliente</a>` : ''}
+          <button class="btn btn-sec btn-peq" data-ver-ct="${ch.contratoId}">Ver contrato</button>
+        </div>
+      </article>`).join('') : '<div class="card vazio">Nenhum chamado ' + (abertos ? 'em aberto 🎉' : 'ainda') + '</div>';
+    $$('[data-salvar-ch]').forEach(b => b.onclick = async () => {
+      const id = b.dataset.salvarCh;
+      try { await enviar('/api/admin/chamados/' + id, 'PUT', { status: $('#st-' + id).value, resposta: $('#resp-' + id).value }); toast('Chamado atualizado.'); abrir('chamados'); }
+      catch (e) { toast(e.message, 'erro'); }
+    });
+    $$('#lista-ch [data-ver-ct]').forEach(b => b.onclick = () => detalhe(b.dataset.verCt));
+  };
+
+  // ================= COBRANÇAS =================
+  $('#mes-cob').value = mesAtual;
+  $('#mes-cob').onchange = () => abrir('cobrancas');
+  carregar.cobrancas = async () => {
+    const lista = await api('/api/admin/cobrancas?mes=' + $('#mes-cob').value);
+    $('#tb-cob').innerHTML = lista.length ? lista.map(c => `
+      <tr><td>${data(c.vencimento)}</td><td>${esc(c.contratoNumero)}</td><td>${esc(c.cliente)}</td><td>${NOMES[c.tipo]}${c.parcela ? ' ' + c.parcela : ''}</td><td>${selo(c.status)}</td>
+      <td class="num">${brl(c.valor)}</td><td class="num">${brl(c.valorLiquido)}</td><td>${data(c.dataPagamento)}</td>
+      <td>${c.linkFatura ? `<a href="${esc(c.linkFatura)}" target="_blank" rel="noopener">fatura</a>` : ''}</td></tr>`).join('')
+      : '<tr><td colspan="9" class="vazio">Nenhuma cobrança com vencimento neste mês.</td></tr>';
+  };
+
+  // ================= DESPESAS =================
+  $('#mes-desp').value = mesAtual;
+  $('#mes-desp').onchange = () => abrir('despesas');
+  let despTodas = false, despCache = [];
+  $('#desp-todas').onclick = () => { despTodas = !despTodas; $('#desp-todas').textContent = despTodas ? 'Ver do mês' : 'Ver todas'; abrir('despesas'); };
+  carregar.despesas = async () => {
+    despCache = await api('/api/admin/despesas' + (despTodas ? '' : '?mes=' + $('#mes-desp').value));
+    $('#tb-desp').innerHTML = despCache.length ? despCache.map(d => `
+      <tr><td>${data(d.data)}</td><td>${esc(d.descricao)}</td><td>${NOMES[d.categoria]}</td>
+      <td>${d.recorrente ? 'Mensal' + (d.fimRecorrencia ? ' até ' + data(d.fimRecorrencia) : '') : 'Avulsa'}</td>
+      <td class="num">${brl(d.valor)}</td>
+      <td><div class="acoes"><button class="btn btn-sec btn-peq" data-ed="${d.id}">Editar</button><button class="btn btn-perigo btn-peq" data-ex="${d.id}">Excluir</button></div></td></tr>`).join('')
+      : '<tr><td colspan="6" class="vazio">Nenhuma despesa.</td></tr>';
+    $('#desp-total').textContent = brl(despCache.reduce((s, d) => s + Number(d.valor), 0));
+    $$('[data-ed]').forEach(b => b.onclick = () => abrirDesp(despCache.find(d => d.id == b.dataset.ed)));
+    $$('[data-ex]').forEach(b => b.onclick = async () => {
+      if (!confirm('Excluir essa despesa?')) return;
+      try { await enviar('/api/admin/despesas/' + b.dataset.ex, 'DELETE'); toast('Despesa excluída.'); abrir('despesas'); } catch (e) { toast(e.message, 'erro'); }
+    });
+  };
+  const fd = $('#form-desp');
+  function abrirDesp(d) {
+    fd.reset(); $('#fd-erro').classList.add('escondido');
+    fd.dataset.id = d ? d.id : '';
+    $('#fd-titulo').textContent = d ? 'Editar despesa' : 'Nova despesa';
+    $('#fd-desc').value = d ? d.descricao : ''; $('#fd-cat').value = d ? d.categoria : 'HOSPEDAGEM';
+    $('#fd-valor').value = d ? d.valor : ''; $('#fd-data').value = d ? d.data : hoje();
+    $('#fd-rec').checked = d ? d.recorrente : false; $('#fd-fim').value = d && d.fimRecorrencia ? d.fimRecorrencia : '';
+    $('#dlg-desp').showModal();
+  }
+  $('#nova-desp').onclick = () => abrirDesp(null);
+  fd.addEventListener('submit', async e => {
+    e.preventDefault();
+    const corpo = { descricao: $('#fd-desc').value.trim(), categoria: $('#fd-cat').value, valor: Number($('#fd-valor').value),
+      data: $('#fd-data').value, recorrente: $('#fd-rec').checked, fimRecorrencia: $('#fd-rec').checked && $('#fd-fim').value ? $('#fd-fim').value : null };
+    const err = $('#fd-erro');
+    if (!corpo.descricao || !(corpo.valor > 0) || !corpo.data) { err.textContent = 'Preencha descrição, valor e data.'; err.classList.remove('escondido'); return; }
+    try {
+      await enviar('/api/admin/despesas' + (fd.dataset.id ? '/' + fd.dataset.id : ''), fd.dataset.id ? 'PUT' : 'POST', corpo);
+      $('#dlg-desp').close(); toast('Despesa salva.'); abrir('despesas');
+    } catch (ex) { err.textContent = ex.message; err.classList.remove('escondido'); }
+  });
+
+  // ================= CONFIGURAÇÕES =================
+  $('#recarregar-wh').onclick = () => abrir('config');
+  carregar.config = async () => {
+    planos = await api('/api/admin/planos');
+    $('#lista-planos').innerHTML = planos.map(p => `
+      <form class="card" data-plano="${esc(p.codigo)}">
+        <h3 style="margin-bottom:12px">${esc(p.nome)}</h3>
+        <div class="linha">
+          <div class="campo"><label>Criação "a partir de" (R$)</label><input name="valorCriacaoBase" type="number" min="0" step="0.01" value="${p.valorCriacaoBase}"></div>
+          <div class="campo"><label>Mensalidade padrão (R$)</label><input name="valorMensal" type="number" min="0" step="0.01" value="${p.valorMensal}"></div>
+        </div>
+        <div class="barra" style="margin:0"><label style="display:flex;gap:8px;align-items:center;margin:0 auto 0 0;color:var(--texto)"><input type="checkbox" name="ativo" style="width:auto" ${p.ativo ? 'checked' : ''}> Aparece no site</label>
+          <button class="btn btn-principal btn-peq">Salvar</button></div>
+      </form>`).join('');
+    $$('form[data-plano]').forEach(f => f.onsubmit = async e => {
+      e.preventDefault();
+      try { await enviar('/api/admin/planos/' + f.dataset.plano, 'PUT', { valorCriacaoBase: Number(f.valorCriacaoBase.value), valorMensal: Number(f.valorMensal.value), ativo: f.ativo.checked }); toast('Plano salvo.'); planos = []; }
+      catch (ex) { toast(ex.message, 'erro'); }
+    });
+    const wh = await api('/api/admin/webhooks');
+    $('#tb-wh').innerHTML = wh.length ? wh.map(w => `
+      <tr><td>${dataHora(w.recebidoEm)}</td><td>${esc(w.tipo)}</td><td class="muted">${esc(w.asaasPaymentId || '—')}</td>
+      <td>${w.processado ? '<span class="selo s-ATIVO">OK</span>' : `<span class="selo s-ATRASADO" title="${esc(w.erro)}">Erro</span>`}</td>
+      <td>${w.processado ? '' : `<button class="btn btn-sec btn-peq" data-reproc="${w.id}">Reprocessar</button>`}</td></tr>`).join('')
+      : '<tr><td colspan="5" class="vazio">Nenhum evento recebido ainda.</td></tr>';
+    $$('[data-reproc]').forEach(b => b.onclick = async () => {
+      try { const r = await enviar(`/api/admin/webhooks/${b.dataset.reproc}/reprocessar`, 'POST'); toast('Resultado: ' + r.resultado); abrir('config'); }
+      catch (e) { toast(e.message, 'erro'); }
+    });
+  };
+
+  if (auth) api('/api/admin/me').then(me => entrar(me.usuario)).catch(() => sair());
+})();
+</script>
+</body>
+</html>
